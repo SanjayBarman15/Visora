@@ -9,7 +9,12 @@
     { "name": "schemas", "path": "packages/schemas" },
     { "name": "tools", "path": "packages/tools" },
     { "name": "mcp", "path": "packages/mcp" },
-    { "name": "db", "path": "packages/db" }
+    { "name": "db", "path": "packages/db" },
+    {"name": "docs", "path": "docs"},
+    {"name": "evals", "path": "evals"},
+    {"name": "infra", "path": "infra"},
+    {"name": "script", "path": "scripts"},
+    {"name": "project_info", "path": "projectinfo"}
   ],
   "settings": {
     "python.defaultInterpreterPath": "${workspaceFolder:root}/.venv/bin/python",
