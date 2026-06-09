@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-
+import {Badge} from "@/components/ui/badge"
 export default function Page() {
   return (
     <div className="flex min-h-svh p-6">
@@ -14,6 +14,7 @@ export default function Page() {
           (Press <kbd>d</kbd> to toggle dark mode)
         </div>
       </div>
+      <Badge variant="secondary">Secondary</Badge>
     </div>
   )
 }
