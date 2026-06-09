@@ -1,23 +1,20 @@
 [project]
-name = "mova-api"
+name = "mova-rag"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
   "mova-schemas",
-  "mova-agents",
   "mova-db",
-  "mova-workers",
-  "fastapi>=0.111",
-  "uvicorn[standard]>=0.30",
-  "python-multipart>=0.0.9",
-  "pydantic-settings>=2.0"
+  "llama-index>=0.11",
+  "langchain>=0.3",
+  "langchain-community>=0.3",
+  "pageindex>=0.1",
+  "supabase>=2.0"
 ]
 
 [tool.uv.sources]
 mova-schemas = { workspace = true }
-mova-agents = { workspace = true }
 mova-db = { workspace = true }
-mova-workers = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
