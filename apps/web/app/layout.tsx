@@ -11,6 +11,20 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+export const metadata = {
+  title: "Mova",
+  description: "Mova application",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon0.svg", type: "image/svg+xml" },
+      { url: "/icon1.png", type: "image/png" }
+    ],
+    apple: "/apple-icon.png",
+  }
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
