@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth-provider"
 import { GooeyToaster } from "@/components/ui/goey-toaster"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})
@@ -41,8 +42,10 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>
-            {children}
-            <GooeyToaster />
+            <TooltipProvider>
+              {children}
+              <GooeyToaster />
+            </TooltipProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
