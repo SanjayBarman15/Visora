@@ -1,11 +1,17 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { MovaHero } from "@/components/mova-hero"
 import { MovaPipeline } from "@/components/mova-pipeline"
 import { MovaComparison } from "@/components/mova-comparison"
 import { MovaExamples } from "@/components/mova-examples"
 import { Code2, ArrowRight, Play, Compass, FileCode, CheckCircle2 } from "lucide-react"
+import { useAuth } from "@/components/auth-provider"
+import Link from "next/link"
 
 export default function Page() {
+  const { session } = useAuth()
+
   return (
     <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300">
       
@@ -32,12 +38,26 @@ export default function Page() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" className="hidden sm:inline-flex text-xs font-mono text-slate-400 hover:text-white cursor-pointer">
-              Sign In
-            </Button>
-            <Button className="bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer">
-              Start Generating
-            </Button>
+            {session ? (
+              <Link href="/dashboard">
+                <Button className="bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer">
+                  Go to Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="hidden sm:inline-flex text-xs font-mono text-slate-400 hover:text-white cursor-pointer">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer">
+                    Start Generating
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -151,10 +171,12 @@ export default function Page() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-4">
-              <Button className="w-full sm:w-auto bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_20px_rgba(56,189,248,0.2)]">
-                Try Mova for Free
-                <ArrowRight className="w-4 h-4" />
-              </Button>
+              <Link href={session ? "/dashboard" : "/signup"} className="w-full sm:w-auto">
+                <Button className="w-full bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                  {session ? "Go to Dashboard" : "Try Mova for Free"}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
               <Button className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 px-8 py-3 rounded-lg flex items-center justify-center gap-2 cursor-pointer">
                 View GitHub Source
                 <FileCode className="w-4 h-4 text-sky-400" />
