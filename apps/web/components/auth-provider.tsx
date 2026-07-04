@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           <span className="absolute bottom-1 left-1 w-2.5 h-2.5 rounded-full bg-amber-400" />
         </div>
         <p className="mt-4 text-xs font-mono text-slate-500 tracking-widest animate-pulse uppercase">
-          Initializing Mova Auth...
+          Initializing Visora Auth...
         </p>
       </div>
     )

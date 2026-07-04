@@ -13,7 +13,7 @@ interface VideoExample {
   codeSnippet: string
 }
 
-export function MovaExamples() {
+export function VisoraExamples() {
   const [activeId, setActiveId] = useState<string>("pythagoras")
   const [isPlaying, setIsPlaying] = useState(true)
   const [progress, setProgress] = useState(40)
@@ -307,7 +307,7 @@ export function MovaExamples() {
               Interactive Concept Gallery
             </h2>
             <p className="text-slate-400 font-sans">
-              Choose a concept to compile and watch Mova&apos;s rendering engine execute 
+              Choose a concept to compile and watch Visora&apos;s rendering engine execute 
               the Python instructions in real-time.
             </p>
           </div>

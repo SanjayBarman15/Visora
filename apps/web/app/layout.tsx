@@ -14,8 +14,8 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata = {
-  title: "Mova",
-  description: "Mova application",
+  title: "Visora",
+  description: "Visora application",
   manifest: "/manifest.json",
   icons: {
     icon: [

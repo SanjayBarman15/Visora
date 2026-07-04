@@ -1,10 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { MovaHero } from "@/components/mova-hero"
-import { MovaPipeline } from "@/components/mova-pipeline"
-import { MovaComparison } from "@/components/mova-comparison"
-import { MovaExamples } from "@/components/mova-examples"
+import { VisoraHero } from "@/components/visora-hero"
+import { VisoraPipeline } from "@/components/visora-pipeline"
+import { VisoraComparison } from "@/components/visora-comparison"
+import { VisoraExamples } from "@/components/visora-examples"
 import { Code2, ArrowRight, Play, Compass, FileCode, CheckCircle2 } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
@@ -26,7 +26,7 @@ export default function Page() {
               <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
               <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
             </div>
-            <span className="font-sans font-bold tracking-tight text-white text-lg">Mova</span>
+            <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
           </div>
 
           {/* Navigation Links */}
@@ -65,21 +65,21 @@ export default function Page() {
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <MovaHero />
+        <VisoraHero />
 
         {/* Multi-Agent Pipeline Section */}
         <div id="pipeline">
-          <MovaPipeline />
+          <VisoraPipeline />
         </div>
 
         {/* Concept Gallery / Examples */}
         <div id="gallery">
-          <MovaExamples />
+          <VisoraExamples />
         </div>
 
         {/* Feature Comparison */}
         <div id="compare">
-          <MovaComparison />
+          <VisoraComparison />
         </div>
 
         {/* Audience / Use Cases Callout */}
@@ -98,7 +98,7 @@ export default function Page() {
                 </h2>
                 <p className="text-slate-400 leading-relaxed font-sans text-sm">
                   Whether you are explaining advanced calculus to high schoolers, publishing scientific 
-                  articles on physics, or building educational Youtube channels, Mova empowers you with:
+                  articles on physics, or building educational Youtube channels, Visora empowers you with:
                 </p>
 
                 <ul className="space-y-3 font-sans text-sm text-slate-300">
@@ -166,14 +166,14 @@ export default function Page() {
               Start Generating Precise Explainer Videos Today
             </h2>
             <p className="text-slate-400 font-sans max-w-xl mx-auto leading-relaxed">
-              Describe your mathematical concept, adjust the parameters, and let Mova&apos;s multi-agent 
+              Describe your mathematical concept, adjust the parameters, and let Visora&apos;s multi-agent 
               system generate production-ready Python Manim scripts and voiceovers.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-4">
               <Link href={session ? "/dashboard" : "/signup"} className="w-full sm:w-auto">
                 <Button className="w-full bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_20px_rgba(56,189,248,0.2)]">
-                  {session ? "Go to Dashboard" : "Try Mova for Free"}
+                  {session ? "Go to Dashboard" : "Try Visora for Free"}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -193,12 +193,12 @@ export default function Page() {
             <div className="w-6 h-6 rounded bg-sky-500/10 border border-sky-500/20 flex items-center justify-center font-mono font-bold text-sky-400 text-xs">
               M
             </div>
-            <span className="font-sans font-bold text-white text-sm">Mova</span>
+            <span className="font-sans font-bold text-white text-sm">Visora</span>
             <span className="text-slate-600 font-mono text-[10px] ml-2">v0.1.0</span>
           </div>
 
           <div className="flex items-center gap-6 text-xs font-mono text-slate-600">
-            <span>&copy; {new Date().getFullYear()} Mova Inc.</span>
+            <span>&copy; {new Date().getFullYear()} Visora Inc.</span>
             <a href="#" className="hover:text-slate-400">Terms</a>
             <a href="#" className="hover:text-slate-400">Privacy</a>
           </div>

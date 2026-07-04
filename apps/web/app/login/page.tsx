@@ -84,7 +84,7 @@ export default function LoginPage() {
               <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
               <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
             </div>
-            <span className="font-sans font-bold tracking-tight text-white text-lg">Mova</span>
+            <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
           </Link>
           <div className="text-xs font-mono text-slate-500">
             01.Authentication
@@ -174,7 +174,7 @@ export default function LoginPage() {
             <div className="relative my-6 flex items-center justify-center">
               <span className="absolute w-full h-[1px] bg-slate-900/60" />
               <span className="relative px-3 bg-[#07090e] text-[10px] font-mono uppercase tracking-wider text-slate-500">
-                New to Mova?
+                New to Visora?
               </span>
             </div>
 

@@ -17,7 +17,7 @@ interface AgentStep {
   badge?: string
 }
 
-export function MovaPipeline() {
+export function VisoraPipeline() {
   const [activeStep, setActiveStep] = useState<number | null>(null)
 
   const steps: AgentStep[] = [
@@ -104,7 +104,7 @@ export function MovaPipeline() {
             Under the Hood: The 8-Agent Pipeline
           </h2>
           <p className="text-slate-400 leading-relaxed font-sans">
-            Mova doesn&apos;t just guess pixels. Eight specialized AI agents coordinate in a sandboxed, 
+            Visora doesn&apos;t just guess pixels. Eight specialized AI agents coordinate in a sandboxed, 
             self-correcting environment to write actual code and sync voiceovers.
           </p>
         </div>
@@ -180,7 +180,7 @@ export function MovaPipeline() {
               <span className="bg-rose-500/20 text-rose-400 text-[10px] font-mono px-2 py-0.5 rounded border border-rose-500/20">Critical Differentiator</span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed font-sans">
-              LLMs often write broken Python code. Mova solves this by wrapping the <strong>Manim Code Writer</strong> and <strong>Code Reviewer</strong> in a tight compile-and-fix feedback loop. The compiler intercepts syntax bugs, type errors, and boundary issues, fixing them before the video renders. You receive perfect, running Python animation code.
+              LLMs often write broken Python code. Visora solves this by wrapping the <strong>Manim Code Writer</strong> and <strong>Code Reviewer</strong> in a tight compile-and-fix feedback loop. The compiler intercepts syntax bugs, type errors, and boundary issues, fixing them before the video renders. You receive perfect, running Python animation code.
             </p>
           </div>
         </div>

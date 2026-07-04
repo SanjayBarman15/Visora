@@ -1,5 +1,5 @@
 {
-  "name": "mova",
+  "name": "visora",
   "private": true,
   "packageManager": "bun@1.2.19",
   "workspaces": [

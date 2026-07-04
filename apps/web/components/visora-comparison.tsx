@@ -2,7 +2,7 @@
 
 import { Check, X, Code2, AlertTriangle, RefreshCw, Cpu } from "lucide-react"
 
-export function MovaComparison() {
+export function VisoraComparison() {
   return (
     <section className="relative bg-[#07090e] py-24 border-b border-slate-900 overflow-hidden">
       {/* Precision background */}
@@ -27,7 +27,7 @@ export function MovaComparison() {
             Not Another Pixel Generator
           </h2>
           <p className="text-slate-400 leading-relaxed font-sans">
-            Most &quot;AI Video&quot; tools output diffusion-based pixel frames. Mova writes and executes 
+            Most &quot;AI Video&quot; tools output diffusion-based pixel frames. Visora writes and executes 
             precise Python code. Here is why that changes everything.
           </p>
         </div>
@@ -36,7 +36,7 @@ export function MovaComparison() {
           {/* Mova Side */}
           <div className="relative rounded-2xl border border-emerald-500/25 bg-slate-950/40 p-8 shadow-xl backdrop-blur-sm">
             <div className="absolute top-0 right-8 -translate-y-1/2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-3 py-1 rounded-full uppercase tracking-wider">
-              Mova (Code-Driven)
+              Visora (Code-Driven)
             </div>
             
             <div className="flex items-center gap-3 mb-6">

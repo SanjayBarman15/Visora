@@ -34,7 +34,7 @@ export default function DashboardPage() {
               <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
               <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
             </div>
-            <span className="font-sans font-bold tracking-tight text-white text-lg">Mova</span>
+            <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
           </div>
 
           <div className="flex items-center gap-4">
