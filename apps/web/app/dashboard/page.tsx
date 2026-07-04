@@ -138,7 +138,9 @@ export default function DashboardPage() {
       {/* 1. Left Sidebar */}
       <Sidebar collapsible="icon" className="border-r border-slate-900 bg-[#07090e] text-slate-100">
         {/* Top Section */}
-        <SidebarHeader className="h-16 flex items-center px-4 justify-between border-b border-slate-900/60">
+        <SidebarHeader className={`h-16 flex flex-row items-center border-b border-slate-900/60 transition-all duration-200 ${
+          sidebarCollapsed ? "justify-center px-0" : "justify-between px-4"
+        }`}>
           <Link href="/" className="flex items-center gap-2 hover:opacity-95 transition-opacity">
             <div className="relative w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-mono font-bold text-sky-400 text-sm shrink-0">
               V
@@ -158,17 +160,17 @@ export default function DashboardPage() {
           )}
         </SidebarHeader>
 
-        <SidebarContent className="p-3 space-y-4">
-          <div>
+        <SidebarContent className={`space-y-4 transition-all duration-200 ${sidebarCollapsed ? "p-2" : "p-3"}`}>
+          <div className="flex justify-center w-full">
             {sidebarCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     onClick={() => selectProject(null)}
                     size="icon"
-                    className="w-10 h-10 mx-auto bg-sky-500 hover:bg-sky-600 text-slate-950 rounded-lg cursor-pointer"
+                    className="w-8 h-8 bg-sky-500 hover:bg-sky-600 text-slate-950 rounded-lg cursor-pointer flex items-center justify-center shrink-0"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">New Video Project</TooltipContent>
@@ -194,17 +196,17 @@ export default function DashboardPage() {
               </SidebarGroupLabel>
             )}
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
+              <SidebarMenu className="space-y-1 w-full flex flex-col items-center">
                 {projects.map((proj) => {
                   const isActive = proj.id === activeProjectId
                   return (
-                    <SidebarMenuItem key={proj.id}>
+                    <SidebarMenuItem key={proj.id} className="w-full flex justify-center">
                       {sidebarCollapsed ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <SidebarMenuButton
                               onClick={() => selectProject(proj.id)}
-                              className={`w-10 h-10 mx-auto rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer p-0 shrink-0 ${
                                 isActive
                                   ? "bg-sky-500/10 text-sky-400 border border-sky-500/25"
                                   : "text-slate-400 hover:bg-slate-900/40 hover:text-white"
@@ -246,11 +248,15 @@ export default function DashboardPage() {
         </SidebarContent>
 
         {/* Bottom Section (User/Settings) */}
-        <SidebarFooter className="p-3 border-t border-slate-900/60 bg-[#07090e]">
+        <SidebarFooter className={`border-t border-slate-900/60 bg-[#07090e] transition-all duration-200 ${
+          sidebarCollapsed ? "p-2" : "p-3"
+        }`}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-3 w-full hover:bg-slate-900/50 p-1.5 rounded-lg transition-colors cursor-pointer text-left focus:outline-none">
-                <Avatar className="w-8 h-8 border border-slate-800">
+              <button className={`flex items-center gap-3 w-full hover:bg-slate-900/50 rounded-lg transition-colors cursor-pointer text-left focus:outline-none ${
+                sidebarCollapsed ? "justify-center p-1" : "p-1.5"
+              }`}>
+                <Avatar className="w-8 h-8 border border-slate-800 shrink-0">
                   <AvatarFallback className="bg-sky-950 text-sky-400 font-bold text-xs">
                     {user?.email?.slice(0, 2).toUpperCase() || "US"}
                   </AvatarFallback>
