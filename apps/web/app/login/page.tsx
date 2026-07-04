@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from "lucide-react"
+import { gooeyToast } from "@/components/ui/goey-toaster"
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -27,7 +28,9 @@ export default function LoginPage() {
 
     const result = loginSchema.safeParse({ email, password })
     if (!result.success) {
-      setError(result.error.issues[0].message)
+      const errMsg = result.error.issues[0].message
+      setError(errMsg)
+      gooeyToast.error(errMsg)
       return
     }
 
@@ -41,11 +44,15 @@ export default function LoginPage() {
 
       if (authError) {
         setError(authError.message)
+        gooeyToast.error(authError.message)
       } else if (data.session) {
+        gooeyToast.success("Successfully signed in!")
         router.push("/dashboard")
       }
     } catch (err: unknown) {
-      setError((err as { message?: string }).message || "An unexpected error occurred.")
+      const errMsg = (err as { message?: string }).message || "An unexpected error occurred."
+      setError(errMsg)
+      gooeyToast.error(errMsg)
     } finally {
       setLoading(false)
     }

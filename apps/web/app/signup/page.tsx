@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react"
+import { gooeyToast } from "@/components/ui/goey-toaster"
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -33,7 +34,9 @@ export default function SignupPage() {
 
     const result = signupSchema.safeParse({ email, password, confirmPassword })
     if (!result.success) {
-      setError(result.error.issues[0].message)
+      const errMsg = result.error.issues[0].message
+      setError(errMsg)
+      gooeyToast.error(errMsg)
       return
     }
 
@@ -50,8 +53,10 @@ export default function SignupPage() {
 
       if (authError) {
         setError(authError.message)
+        gooeyToast.error(authError.message)
       } else {
         setSuccess(true)
+        gooeyToast.success("Verification email sent!")
         // If auto-signed in, wait a bit then redirect.
         if (data?.session) {
           setTimeout(() => {
@@ -60,7 +65,9 @@ export default function SignupPage() {
         }
       }
     } catch (err: unknown) {
-      setError((err as { message?: string }).message || "An unexpected error occurred.")
+      const errMsg = (err as { message?: string }).message || "An unexpected error occurred."
+      setError(errMsg)
+      gooeyToast.error(errMsg)
     } finally {
       setLoading(false)
     }
