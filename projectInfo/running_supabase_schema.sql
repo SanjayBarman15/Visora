@@ -1,3 +1,4 @@
+-- current running schema in supbase db
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
@@ -205,17 +206,42 @@ CREATE TABLE public.feedback_events (
   CONSTRAINT feedback_events_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.sessions(id),
   CONSTRAINT feedback_retrieval_log_fkey FOREIGN KEY (retrieval_log_id) REFERENCES public.rag_retrieval_logs(id)
 );
-CREATE TABLE public.project_memory (
+CREATE TABLE public.user_memory (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL UNIQUE,
-  preferred_visual_style text,
-  preferred_voice_id text,
-  animation_complexity_preference text,
-  color_palettes jsonb DEFAULT '[]'::jsonb,
-  successful_animation_types ARRAY DEFAULT '{}'::text[],
+  user_id uuid NOT NULL,
+  project_id uuid,
+  fact_type text,
+  fact_text text NOT NULL,
+  embedding USER-DEFINED,
+  embedding_model text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_memory_pkey PRIMARY KEY (id),
+  CONSTRAINT user_memory_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT user_memory_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id)
+);
+CREATE TABLE public.memory_nodes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  node_type text NOT NULL,
+  label text NOT NULL,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT memory_nodes_pkey PRIMARY KEY (id),
+  CONSTRAINT memory_nodes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.memory_edges (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  source_node_id uuid NOT NULL,
+  target_node_id uuid NOT NULL,
+  relationship_type text NOT NULL,
+  weight double precision DEFAULT 1.0,
+  created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT project_memory_pkey PRIMARY KEY (id),
-  CONSTRAINT project_memory_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+  CONSTRAINT memory_edges_pkey PRIMARY KEY (id),
+  CONSTRAINT memory_edges_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT memory_edges_source_node_id_fkey FOREIGN KEY (source_node_id) REFERENCES public.memory_nodes(id),
+  CONSTRAINT memory_edges_target_node_id_fkey FOREIGN KEY (target_node_id) REFERENCES public.memory_nodes(id)
 );
 CREATE TABLE public.rag_documents (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -226,10 +252,10 @@ CREATE TABLE public.rag_documents (
   manim_version text,
   is_candidate boolean DEFAULT false,
   is_stale boolean DEFAULT false,
+  is_promoted boolean DEFAULT false,
   quality_score double precision DEFAULT 0.5,
   retrieval_count integer DEFAULT 0,
   retrieval_success_rate double precision DEFAULT 0.0,
-  embedding USER-DEFINED,
   embedding_model text,
   tags ARRAY DEFAULT '{}'::text[],
   metadata jsonb DEFAULT '{}'::jsonb,
@@ -244,10 +270,10 @@ CREATE TABLE public.rag_retrieval_logs (
   project_id uuid,
   scene_id uuid,
   query_text text NOT NULL,
-  query_embedding USER-DEFINED,
   retrieved_document_ids ARRAY DEFAULT '{}'::uuid[],
   similarity_scores ARRAY DEFAULT '{}'::double precision[],
   reranked_document_ids ARRAY DEFAULT '{}'::uuid[],
+  retrieval_source text DEFAULT 'pinecone'::text,
   cache_hit boolean DEFAULT false,
   retrieval_latency_ms integer,
   created_at timestamp with time zone DEFAULT now(),
@@ -266,6 +292,16 @@ CREATE TABLE public.pageindex_indexes (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT pageindex_indexes_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.turbovec_indexes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  storage_path text NOT NULL,
+  document_count integer,
+  min_quality_score double precision DEFAULT 0.65,
+  build_status text DEFAULT 'pending'::text,
+  built_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT turbovec_indexes_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.api_changes (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
