@@ -43,7 +43,7 @@ interface DashboardState {
   toggleSidebar: () => void
   selectProject: (id: string | null) => void
   setActiveProject: (id: string | null) => void
-  startNewProject: (promptText: string) => void
+  startNewProject: (promptText: string) => string
   sendMessage: (content: string) => void
   addMessage: (projectId: string, message: { id: string; role: Message["role"]; content: string; timestamp: string }) => void
   updateProjectStatus: (id: string, status: Project["status"]) => void
@@ -481,6 +481,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         }
       })
     }, 1500)
+
+    return newId
   },
 
   sendMessage: (content) => {

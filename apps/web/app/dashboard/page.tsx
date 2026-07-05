@@ -20,11 +20,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export default function DashboardPage() {
+export default function DashboardPage({ isProjectSubroute = false }: { isProjectSubroute?: boolean } = {}) {
   const {
     activeProjectId,
     projects,
     toggleSidebar,
+    setActiveProject,
   } = useDashboardStore()
 
   const { user, signOut } = useAuthStore()
@@ -35,6 +36,12 @@ export default function DashboardPage() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!isProjectSubroute) {
+      setActiveProject(null)
+    }
+  }, [isProjectSubroute, setActiveProject])
 
   const isChatActive = useIsChatActive()
   const activeProject = projects.find((p) => p.id === activeProjectId)

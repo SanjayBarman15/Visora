@@ -5,13 +5,14 @@ import { useDashboardStore } from "@/hooks/use-dashboard-store"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function DashboardSidebar() {
+  const router = useRouter()
   const {
     sidebarCollapsed,
     projects,
     activeProjectId,
-    selectProject,
   } = useDashboardStore()
 
   if (sidebarCollapsed) return null
@@ -26,7 +27,7 @@ export function DashboardSidebar() {
       {/* Content */}
       <div className="flex-1 p-3 space-y-4 overflow-y-auto scrollbar-none">
         <Button
-          onClick={() => selectProject(null)}
+          onClick={() => router.push("/dashboard")}
           className="w-full bg-[#0ea5e9] hover:bg-sky-600 text-slate-950 font-semibold py-2 rounded-lg cursor-pointer flex items-center justify-center gap-1.5 text-xs shadow-sm border-none"
         >
           <Plus className="w-4 h-4" />
@@ -41,7 +42,7 @@ export function DashboardSidebar() {
             return (
               <button
                 key={proj.id}
-                onClick={() => selectProject(proj.id)}
+                onClick={() => router.push(`/dashboard/project/${proj.id}`)}
                 className={`w-full text-left p-3 rounded-lg transition-all flex flex-col gap-1.5 cursor-pointer border ${
                   isActive
                     ? "bg-slate-200/60 dark:bg-[#161920]/60 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white"

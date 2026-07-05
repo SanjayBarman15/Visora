@@ -9,7 +9,10 @@ import { Sparkles, Cpu, ArrowUp } from "lucide-react"
 import { MessageRenderer } from "./MessageRenderer"
 import { gooeyToast } from "@/components/ui/goey-toaster"
 
+import { useRouter } from "next/navigation"
+
 export function ChatView() {
+  const router = useRouter()
   const [initPromptText, setInitPromptText] = useState("")
   const [chatInputText, setChatInputText] = useState("")
   const [revisionConfirmText, setRevisionConfirmText] = useState("")
@@ -43,7 +46,8 @@ export function ChatView() {
   const handleInitSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!initPromptText.trim()) return
-    startNewProject(initPromptText)
+    const newId = startNewProject(initPromptText)
+    router.push(`/dashboard/project/${newId}`)
     setInitPromptText("")
   }
 
