@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ArrowUp } from "lucide-react"
+import { ScenePlanCard } from "./chat/ScenePlanCard"
 
 export function ChatPanel() {
   const [chatInputText, setChatInputText] = useState("")
@@ -31,7 +32,7 @@ export function ChatPanel() {
   }
 
   return (
-    <div className="w-[300px] border-r border-slate-200/80 dark:border-slate-900 bg-white dark:bg-[#07090e]/40 flex flex-col shrink-0">
+    <div className="w-full h-full flex flex-col bg-white dark:bg-[#07090e]/40">
       <div className="p-4 border-b border-slate-200/80 dark:border-slate-900 bg-slate-50/80 dark:bg-slate-950/20">
         <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider font-mono">
           Refinement Chat
@@ -40,6 +41,9 @@ export function ChatPanel() {
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4 pb-4">
           {activeMessages.map((msg) => {
+            if (msg.role === "scene_plan") {
+              return <ScenePlanCard key={msg.id} projectId={activeProjectId!} />
+            }
             const isUser = msg.role === "user"
             return (
               <div key={msg.id} className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>

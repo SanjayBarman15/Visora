@@ -3,7 +3,7 @@ import { create } from "zustand"
 export interface Message {
   id: string
   projectId: string
-  role: "user" | "assistant"
+  role: "user" | "assistant" | "scene_plan"
   content: string
   timestamp: string
 }
@@ -26,6 +26,7 @@ export interface Project {
   lastMessageAt: string
   status: "draft" | "eliciting" | "plan_review" | "generating" | "assembling" | "done" | "done_with_warnings" | "error"
   activeSceneIndex: number
+  narrationEnabled: boolean
 }
 
 interface DashboardState {
@@ -50,6 +51,8 @@ interface DashboardState {
   reorderScenes: (projectId: string, startIndex: number, endIndex: number) => void
   deleteScene: (projectId: string, sceneId: string) => void
   approvePlan: (projectId: string) => void
+  approveScenePlan: (projectId: string) => void
+  toggleNarration: (projectId: string) => void
 }
 
 // Mock Manim Codes
@@ -170,6 +173,7 @@ const initialProjects: Project[] = [
     lastMessageAt: "2026-07-04T12:00:00Z",
     status: "done",
     activeSceneIndex: 0,
+    narrationEnabled: true,
   },
   {
     id: "proj_2",
@@ -178,6 +182,7 @@ const initialProjects: Project[] = [
     lastMessageAt: "2026-07-04T10:30:00Z",
     status: "generating",
     activeSceneIndex: 1,
+    narrationEnabled: true,
   },
   {
     id: "proj_3",
@@ -186,6 +191,7 @@ const initialProjects: Project[] = [
     lastMessageAt: "2026-07-04T09:15:00Z",
     status: "plan_review",
     activeSceneIndex: 0,
+    narrationEnabled: true,
   },
 ]
 
@@ -334,6 +340,13 @@ const initialMessages: Message[] = [
       "Hello! I have created the preliminary scene outline for your Merge Sort animation. Please review the plan below, edit any descriptions or durations as you see fit, and click 'Approve & Start Generation' when you are ready to render.",
     timestamp: "2026-07-04T09:15:00Z",
   },
+  {
+    id: "m_scene_plan_proj_3",
+    projectId: "proj_3",
+    role: "scene_plan",
+    content: "",
+    timestamp: "2026-07-04T09:15:05Z",
+  },
 ]
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -358,6 +371,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       lastMessageAt: new Date().toISOString(),
       status: "eliciting",
       activeSceneIndex: 0,
+      narrationEnabled: true,
     }
 
     const starterScenes: Scene[] = [
@@ -438,9 +452,17 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           }
         ]
 
+        const scenePlanMsg: Message = {
+          id: `m_sp_${Date.now()}`,
+          projectId: newId,
+          role: "scene_plan",
+          content: "",
+          timestamp: new Date().toISOString(),
+        }
+
         return {
           projects: updatedProjects,
-          messages: [...state.messages, assistantMessage],
+          messages: [...state.messages, assistantMessage, scenePlanMsg],
           scenePlans: {
             ...state.scenePlans,
             [newId]: outlineScenes,
@@ -568,6 +590,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
 
   approvePlan: (projectId) => {
+    get().approveScenePlan(projectId)
+  },
+
+  approveScenePlan: (projectId) => {
     // Set status to generating
     set((state) => ({
       projects: state.projects.map((p) =>
@@ -600,10 +626,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           
           // Check if final step (all done) -> transition project status to assembling then done
           const isAllDone = stepStatuses.every((s) => s === "done")
-          let newStatus: Project["status"] = "generating"
           
           if (isAllDone) {
-            newStatus = "assembling"
             // Quickly assemble and transition to done
             setTimeout(() => {
               set((state2) => ({
@@ -627,4 +651,22 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       }, (index + 1) * 2000)
     })
   },
+
+  toggleNarration: (projectId) => {
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === projectId ? { ...p, narrationEnabled: !p.narrationEnabled } : p
+      ),
+    }))
+  },
 }))
+
+export const useIsChatActive = () => {
+  return useDashboardStore((state) => {
+    if (!state.activeProjectId) return false
+    const activeProject = state.projects.find((p) => p.id === state.activeProjectId)
+    if (!activeProject) return false
+    const hasMessages = state.messages.some((m) => m.projectId === state.activeProjectId)
+    return activeProject.status !== "draft" || hasMessages
+  })
+}
