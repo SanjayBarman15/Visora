@@ -76,10 +76,8 @@ export default function DashboardPage({ isProjectSubroute = false }: { isProject
           <ChatView />
         ) : (activeProject?.status === "draft" || activeProject?.status === "eliciting" || activeProject?.status === "plan_review") ? (
           /* State B: Unified conversation chat view (full width scrollable) */
-          <div className="flex-1 flex overflow-hidden relative justify-center bg-white dark:bg-[#07090e]/20">
-            <div className="w-full max-w-2xl border-x border-slate-200 dark:border-slate-900/60 h-full">
-              <ChatView />
-            </div>
+          <div className="flex-1 flex overflow-hidden relative bg-white dark:bg-[#07090e]/20">
+            <ChatView />
           </div>
         ) : (
           /* State C: Active 3-panel workspace (Generating or Completed video) */

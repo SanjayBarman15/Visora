@@ -143,81 +143,94 @@ export function ChatView() {
     )
   }
 
+  const getPlaceholderText = () => {
+    if (!activeProject) return "Describe the video you want to create..."
+    if (activeProject.status === "eliciting" || activeProject.status === "plan_review" || activeProject.status === "draft") {
+      return "Ask a question or suggest a change..."
+    }
+    return "Describe what to animate..."
+  }
+
   // Mode B: Conversation mode
   return (
-    <div className="w-full h-full flex flex-col bg-slate-50 dark:bg-[#05070a] border-r border-slate-200 dark:border-slate-900">
-      <div className="p-3 border-b border-slate-200 dark:border-slate-900 bg-slate-100 dark:bg-[#090b10] flex items-center justify-between">
-        <h3 className="text-[10px] font-bold text-slate-550 dark:text-slate-400 uppercase tracking-wider font-mono">
-          Copilot
-        </h3>
-      </div>
+    <div className="w-full h-full flex flex-col bg-white dark:bg-[#07090c] border-r border-slate-200 dark:border-slate-900">
       
-      <ScrollArea className="flex-1 p-4 bg-white dark:bg-[#07090c]">
-        <div className="space-y-4 pb-4">
-          {activeMessages.map((msg) => (
-            <MessageRenderer key={msg.id} message={msg} />
-          ))}
+      <ScrollArea className="flex-1 bg-white dark:bg-[#07090c]">
+        <div className="max-w-[760px] mx-auto w-full px-4 py-8 flex flex-col gap-6">
+          {activeMessages.map((msg, idx) => {
+            const prevMsg = idx > 0 ? activeMessages[idx - 1] : null
+            const isContinuation = prevMsg?.role === msg.role || (msg.role === "scene_plan" && prevMsg?.role === "assistant")
+            return (
+              <div key={msg.id} className={isContinuation ? "-mt-4" : ""}>
+                <MessageRenderer message={msg} isContinuation={isContinuation} />
+              </div>
+            )
+          })}
           <div ref={messageEndRef} />
         </div>
       </ScrollArea>
 
       {revisionConfirmText && (
-        <div className="mx-4 my-2 p-3 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl space-y-2 animate-fade-in relative z-25">
-          <p className="text-[10px] text-slate-650 dark:text-slate-400 leading-normal">
-            <strong>Revision requested mid-generation:</strong> "{revisionConfirmText}"
-            <br />
-            Choose how to apply this feedback:
-          </p>
-          <div className="flex gap-2 justify-end">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setRevisionConfirmText("")
-              }}
-              className="text-[9px] h-6 cursor-pointer text-slate-500 dark:text-slate-455 hover:text-slate-900 dark:hover:text-white"
-            >
-              Dismiss
-            </Button>
-            <Button
-              size="sm"
-              className="text-[9px] h-6 cursor-pointer bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 hover:bg-slate-300 dark:hover:bg-slate-800 text-slate-800 dark:text-white"
-              onClick={() => {
-                queueRevision(activeProjectId!, revisionConfirmText)
-                gooeyToast.success("Got it, we'll apply this once the current generation finishes")
-                setRevisionConfirmText("")
-              }}
-            >
-              Wait
-            </Button>
-            <Button
-              size="sm"
-              className="text-[9px] h-6 cursor-pointer bg-violet-600 hover:bg-violet-750 text-white font-bold"
-              onClick={() => {
-                cancelGenerationAndRevise(activeProjectId!, revisionConfirmText)
-                gooeyToast.success("Generation cancelled — updating your plan")
-                setRevisionConfirmText("")
-              }}
-            >
-              Cancel & revise now
-            </Button>
+        <div className="max-w-[760px] mx-auto w-full px-4 my-2">
+          <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl space-y-2 animate-fade-in relative z-25">
+            <p className="text-[10px] text-slate-650 dark:text-slate-400 leading-normal">
+              <strong>Revision requested mid-generation:</strong> "{revisionConfirmText}"
+              <br />
+              Choose how to apply this feedback:
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setRevisionConfirmText("")
+                }}
+                className="text-[9px] h-6 cursor-pointer text-slate-500 dark:text-slate-455 hover:text-slate-900 dark:hover:text-white"
+              >
+                Dismiss
+              </Button>
+              <Button
+                size="sm"
+                className="text-[9px] h-6 cursor-pointer bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 hover:bg-slate-300 dark:hover:bg-slate-800 text-slate-800 dark:text-white"
+                onClick={() => {
+                  queueRevision(activeProjectId!, revisionConfirmText)
+                  gooeyToast.success("Got it, we'll apply this once the current generation finishes")
+                  setRevisionConfirmText("")
+                }}
+              >
+                Wait
+              </Button>
+              <Button
+                size="sm"
+                className="text-[9px] h-6 cursor-pointer bg-violet-600 hover:bg-violet-750 text-white font-bold"
+                onClick={() => {
+                  cancelGenerationAndRevise(activeProjectId!, revisionConfirmText)
+                  gooeyToast.success("Generation cancelled — updating your plan")
+                  setRevisionConfirmText("")
+                }}
+              >
+                Cancel & revise now
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="p-3 border-t border-slate-200 dark:border-slate-900 bg-slate-100 dark:bg-[#090b10]">
-        <form onSubmit={handleChatSubmit} className="flex gap-2 relative items-center">
-          <input
-            type="text"
-            placeholder="Describe what to animate..."
-            value={chatInputText}
-            onChange={(e) => setChatInputText(e.target.value)}
-            className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg pl-3 pr-9 py-2 text-xs placeholder-slate-450 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-violet-500/50 shadow-inner font-sans"
-          />
-          <Button type="submit" disabled={!chatInputText.trim()} size="icon" className="w-7 h-7 bg-violet-600 hover:bg-violet-700 text-white absolute right-1 cursor-pointer rounded-md">
-            <ArrowUp className="w-3.5 h-3.5" />
-          </Button>
-        </form>
+      <div className="border-t border-slate-100 dark:border-slate-900/60 p-4 bg-white dark:bg-[#07090c]">
+        <div className="max-w-[760px] mx-auto w-full">
+          <form onSubmit={handleChatSubmit} className="flex gap-2 relative items-center">
+            <input
+              type="text"
+              placeholder={getPlaceholderText()}
+              value={chatInputText}
+              onChange={(e) => setChatInputText(e.target.value)}
+              className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg pl-3 pr-9 py-2.5 text-xs placeholder-slate-450 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-violet-500/50 shadow-inner font-sans"
+            />
+            <Button type="submit" disabled={!chatInputText.trim()} size="icon" className="w-7 h-7 bg-violet-600 hover:bg-violet-700 text-white absolute right-1 cursor-pointer rounded-md">
+              <ArrowUp className="w-3.5 h-3.5" />
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   )
