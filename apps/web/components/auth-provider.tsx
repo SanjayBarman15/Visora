@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import Image from "next/image"
 import { supabase } from "@/lib/supabase"
 import { Session, User } from "@supabase/supabase-js"
 
@@ -74,10 +75,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col items-center justify-center font-sans">
-        <div className="relative w-16 h-16 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-mono font-bold text-sky-400 text-2xl animate-pulse">
-          M
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-          <span className="absolute bottom-1 left-1 w-2.5 h-2.5 rounded-full bg-amber-400" />
+        <div className="relative w-16 h-16 flex items-center justify-center animate-pulse">
+          <Image
+            src="/visora_logo_removebg.png"
+            alt="Visora Logo"
+            width={64}
+            height={64}
+            className="object-contain"
+          />
         </div>
         <p className="mt-4 text-xs font-mono text-slate-500 tracking-widest animate-pulse uppercase">
           Initializing Visora Auth...

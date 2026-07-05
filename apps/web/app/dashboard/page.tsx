@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
+import Image from "next/image"
 import { useAuth } from "@/components/auth-provider"
 import { useDashboardStore, Message, Project } from "@/hooks/use-dashboard-store"
 import { Button } from "@/components/ui/button"
@@ -142,11 +143,13 @@ export default function DashboardPage() {
           sidebarCollapsed ? "justify-center px-0" : "justify-between px-4"
         }`}>
           <Link href="/" className="flex items-center gap-2 hover:opacity-95 transition-opacity">
-            <div className="relative w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-mono font-bold text-sky-400 text-sm shrink-0">
-              V
-              <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
-              <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
-            </div>
+            <Image
+              src="/visora_logo_removebg.png"
+              alt="Visora Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
             {!sidebarCollapsed && (
               <span className="font-sans font-bold tracking-tight text-white text-md">Visora</span>
             )}

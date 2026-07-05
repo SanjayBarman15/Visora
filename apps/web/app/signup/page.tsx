@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
@@ -46,23 +47,15 @@ export default function SignupPage() {
       const { data, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
       })
 
       if (authError) {
         setError(authError.message)
         gooeyToast.error(authError.message)
-      } else {
+      } else if (data.user) {
         setSuccess(true)
-        gooeyToast.success("Verification email sent!")
-        // If auto-signed in, wait a bit then redirect.
-        if (data?.session) {
-          setTimeout(() => {
-            router.push("/dashboard")
-          }, 1500)
-        }
+        gooeyToast.success("Successfully registered!")
+        router.push("/dashboard")
       }
     } catch (err: unknown) {
       const errMsg = (err as { message?: string }).message || "An unexpected error occurred."
@@ -94,11 +87,13 @@ export default function SignupPage() {
       <header className="w-full border-b border-slate-900/60 bg-[#05070a]/80 backdrop-blur-md z-10">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <div className="relative w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-mono font-bold text-sky-400 text-sm">
-              M
-              <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
-              <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
-            </div>
+            <Image
+              src="/visora_logo_removebg.png"
+              alt="Visora Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
             <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
           </Link>
           <div className="text-xs font-mono text-slate-500">

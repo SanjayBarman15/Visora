@@ -8,6 +8,7 @@ import { VisoraExamples } from "@/components/visora-examples"
 import { Code2, ArrowRight, Play, Compass, FileCode, CheckCircle2 } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function Page() {
   const { session } = useAuth()
@@ -19,13 +20,13 @@ export default function Page() {
       <header className="sticky top-0 z-50 w-full border-b border-slate-900 bg-[#05070a]/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {/* Math Vector Style Logo */}
-            <div className="relative w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-mono font-bold text-sky-400 text-sm">
-              M
-              {/* Corner coordinate decorations */}
-              <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
-              <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
-            </div>
+            <Image
+              src="/visora_logo_removebg.png"
+              alt="Visora Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
             <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
           </div>
 
@@ -190,9 +191,13 @@ export default function Page() {
       <footer className="border-t border-slate-900 bg-[#05070a] py-12">
         <div className="container mx-auto px-6 max-w-6xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-sky-500/10 border border-sky-500/20 flex items-center justify-center font-mono font-bold text-sky-400 text-xs">
-              M
-            </div>
+            <Image
+              src="/visora_logo_removebg.png"
+              alt="Visora Logo"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
             <span className="font-sans font-bold text-white text-sm">Visora</span>
             <span className="text-slate-600 font-mono text-[10px] ml-2">v0.1.0</span>
           </div>

@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
@@ -25,47 +26,37 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-
-    const result = loginSchema.safeParse({ email, password })
-    if (!result.success) {
-      const errMsg = result.error.issues[0].message
-      setError(errMsg)
-      gooeyToast.error(errMsg)
-      return
-    }
-
     setLoading(true)
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      loginSchema.parse({ email, password })
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (authError) {
-        setError(authError.message)
-        gooeyToast.error(authError.message)
-      } else if (data.session) {
-        gooeyToast.success("Successfully signed in!")
-        router.push("/dashboard")
-      }
-    } catch (err: unknown) {
-      const errMsg = (err as { message?: string }).message || "An unexpected error occurred."
-      setError(errMsg)
-      gooeyToast.error(errMsg)
+      if (signInError) throw signInError
+      gooeyToast.success("Welcome back!", {
+        description: "You have successfully signed in.",
+      })
+      router.push("/dashboard")
+      router.refresh()
+    } catch (err) {
+      const error = err as { message?: string }
+      setError(error.message || "An unexpected error occurred.")
+      gooeyToast.error("Sign in failed", {
+        description: error.message || "Please check your credentials.",
+      })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-950/10 rounded-full blur-[120px] pointer-events-none" />
-
-      {/* Grid Pattern */}
+    <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col font-sans relative overflow-hidden">
+      {/* Decorative Grid Background */}
       <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(to right, #ffffff 1px, transparent 1px),
@@ -79,11 +70,13 @@ export default function LoginPage() {
       <header className="w-full border-b border-slate-900/60 bg-[#05070a]/80 backdrop-blur-md z-10">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <div className="relative w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-mono font-bold text-sky-400 text-sm">
-              M
-              <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-emerald-400" />
-              <span className="absolute bottom-0.5 left-0.5 w-1 h-1 rounded-full bg-amber-400" />
-            </div>
+            <Image
+              src="/visora_logo_removebg.png"
+              alt="Visora Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
             <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
           </Link>
           <div className="text-xs font-mono text-slate-500">
