@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Sparkles, Cpu, ArrowUp } from "lucide-react"
 import { MessageRenderer } from "./MessageRenderer"
+import { gooeyToast } from "@/components/ui/goey-toaster"
 
 export function ChatView() {
   const [initPromptText, setInitPromptText] = useState("")
   const [chatInputText, setChatInputText] = useState("")
+  const [revisionConfirmText, setRevisionConfirmText] = useState("")
   const messageEndRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -19,6 +21,8 @@ export function ChatView() {
     messages,
     sendMessage,
     startNewProject,
+    cancelGenerationAndRevise,
+    queueRevision,
   } = useDashboardStore()
 
   const activeProject = projects.find((p) => p.id === activeProjectId)
@@ -47,6 +51,13 @@ export function ChatView() {
   const handleChatSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!chatInputText.trim()) return
+
+    if (activeProject && activeProject.status === "generating") {
+      setRevisionConfirmText(chatInputText)
+      setChatInputText("")
+      return
+    }
+
     sendMessage(chatInputText)
     setChatInputText("")
   }
@@ -145,6 +156,50 @@ export function ChatView() {
           <div ref={messageEndRef} />
         </div>
       </ScrollArea>
+
+      {revisionConfirmText && (
+        <div className="mx-4 my-2 p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2 animate-fade-in relative z-25">
+          <p className="text-[10px] text-slate-400 leading-normal">
+            <strong>Revision requested mid-generation:</strong> "{revisionConfirmText}"
+            <br />
+            Choose how to apply this feedback:
+          </p>
+          <div className="flex gap-2 justify-end">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setRevisionConfirmText("")
+              }}
+              className="text-[9px] h-6 cursor-pointer text-slate-400 hover:text-white"
+            >
+              Dismiss
+            </Button>
+            <Button
+              size="sm"
+              className="text-[9px] h-6 cursor-pointer bg-slate-850 hover:bg-slate-800 text-white"
+              onClick={() => {
+                queueRevision(activeProjectId!, revisionConfirmText)
+                gooeyToast.success("Got it, we'll apply this once the current generation finishes")
+                setRevisionConfirmText("")
+              }}
+            >
+              Wait
+            </Button>
+            <Button
+              size="sm"
+              className="text-[9px] h-6 cursor-pointer bg-sky-500 hover:bg-sky-600 text-slate-950 font-bold"
+              onClick={() => {
+                cancelGenerationAndRevise(activeProjectId!, revisionConfirmText)
+                gooeyToast.success("Generation cancelled — updating your plan")
+                setRevisionConfirmText("")
+              }}
+            >
+              Cancel & revise now
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="p-4 border-t border-slate-200/80 dark:border-slate-900 bg-white dark:bg-[#05070a]">
         <form onSubmit={handleChatSubmit} className="flex gap-2">

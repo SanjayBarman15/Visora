@@ -27,6 +27,7 @@ export interface Project {
   status: "draft" | "eliciting" | "plan_review" | "generating" | "assembling" | "done" | "done_with_warnings" | "error"
   activeSceneIndex: number
   narrationEnabled: boolean
+  pendingRevisions: string[]
 }
 
 interface DashboardState {
@@ -56,6 +57,8 @@ interface DashboardState {
   toggleNarration: (projectId: string) => void
   regenerateScene: (projectId: string, sceneId: string) => Promise<void>
   adjustAudioOnly: (projectId: string, changes: string) => Promise<void>
+  cancelGenerationAndRevise: (projectId: string, messageContent: string) => void
+  queueRevision: (projectId: string, messageContent: string) => void
 }
 
 // Mock Manim Codes
@@ -177,6 +180,7 @@ const initialProjects: Project[] = [
     status: "done",
     activeSceneIndex: 0,
     narrationEnabled: true,
+    pendingRevisions: [],
   },
   {
     id: "proj_2",
@@ -186,6 +190,7 @@ const initialProjects: Project[] = [
     status: "generating",
     activeSceneIndex: 1,
     narrationEnabled: true,
+    pendingRevisions: [],
   },
   {
     id: "proj_3",
@@ -195,6 +200,7 @@ const initialProjects: Project[] = [
     status: "plan_review",
     activeSceneIndex: 0,
     narrationEnabled: true,
+    pendingRevisions: [],
   },
 ]
 
@@ -376,6 +382,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       status: "eliciting",
       activeSceneIndex: 0,
       narrationEnabled: true,
+      pendingRevisions: [],
     }
 
     const starterScenes: Scene[] = [
@@ -621,6 +628,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     steps.forEach((stepStatuses, index) => {
       setTimeout(() => {
         set((state) => {
+          // If project was cancelled mid-generation, stop the steps!
+          const activeProj = state.projects.find((p) => p.id === projectId)
+          if (!activeProj || activeProj.status !== "generating") return {}
+
           const scenes = state.scenePlans[projectId] || []
           const updatedScenes = scenes.map((s, idx) => {
             const nextStatus = stepStatuses[idx] || "done"
@@ -637,11 +648,54 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           if (isAllDone) {
             // Quickly assemble and transition to done
             setTimeout(() => {
-              set((state2) => ({
-                projects: state2.projects.map((p2) =>
-                  p2.id === projectId ? { ...p2, status: "done" as const } : p2
-                ),
-              }))
+              set((state2) => {
+                const project = state2.projects.find((p) => p.id === projectId)
+                if (!project || project.status !== "generating") return {}
+                
+                const pending = project.pendingRevisions || []
+                
+                // If there are pending revisions, apply them automatically!
+                if (pending.length > 0) {
+                  // Add user messages
+                  const newMessages = pending.map((revText, rIdx) => ({
+                    id: `m_rev_${Date.now()}_${rIdx}`,
+                    projectId,
+                    role: "user" as const,
+                    content: revText,
+                    timestamp: new Date().toISOString(),
+                  }))
+                  
+                  // Add assistant response that acknowledges it and asks to review updated plan
+                  const assistantMsg = {
+                    id: `m_ast_rev_${Date.now()}`,
+                    projectId,
+                    role: "assistant" as const,
+                    content: `I've finished the previous generation. Now, I'm applying your pending feedback: "${pending.join(", ")}". Let me know if the updated scene plan looks good!`,
+                    timestamp: new Date().toISOString(),
+                  }
+                  
+                  const scenePlanMsg = {
+                    id: `m_sp_rev_${Date.now()}`,
+                    projectId,
+                    role: "scene_plan" as const,
+                    content: "",
+                    timestamp: new Date().toISOString(),
+                  }
+                  
+                  return {
+                    projects: state2.projects.map((p2) =>
+                      p2.id === projectId ? { ...p2, status: "plan_review" as const, pendingRevisions: [] } : p2
+                    ),
+                    messages: [...state2.messages, ...newMessages, assistantMsg, scenePlanMsg]
+                  }
+                }
+                
+                return {
+                  projects: state2.projects.map((p2) =>
+                    p2.id === projectId ? { ...p2, status: "done" as const } : p2
+                  ),
+                }
+              })
             }, 1500)
           }
 
@@ -696,6 +750,45 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   adjustAudioOnly: async (projectId, changes) => {
     // Audio-only adjustment does not touch scene status. Just wait and simulate remixing
     await new Promise((resolve) => setTimeout(resolve, 2000))
+  },
+
+  cancelGenerationAndRevise: (projectId, messageContent) => {
+    const userMessage = {
+      id: `m_user_cancel_${Date.now()}`,
+      projectId,
+      role: "user" as const,
+      content: messageContent,
+      timestamp: new Date().toISOString(),
+    }
+    const assistantMessage = {
+      id: `m_ast_cancel_${Date.now()}`,
+      projectId,
+      role: "assistant" as const,
+      content: `Got it. I've cancelled the current generation process. What changes would you like to make to the scene plan? Here is the plan rolled back to draft:`,
+      timestamp: new Date().toISOString(),
+    }
+    const scenePlanMsg = {
+      id: `m_sp_cancel_${Date.now()}`,
+      projectId,
+      role: "scene_plan" as const,
+      content: "",
+      timestamp: new Date().toISOString(),
+    }
+
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === projectId ? { ...p, status: "plan_review" as const, pendingRevisions: [] } : p
+      ),
+      messages: [...state.messages, userMessage, assistantMessage, scenePlanMsg]
+    }))
+  },
+
+  queueRevision: (projectId, messageContent) => {
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === projectId ? { ...p, pendingRevisions: [...(p.pendingRevisions || []), messageContent] } : p
+      ),
+    }))
   },
 }))
 
