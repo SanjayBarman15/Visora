@@ -1,11 +1,9 @@
 "use client"
 
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { VisoraHeader } from "@/components/visora-header"
-import { supabase } from "@/lib/supabase"
+import { useAuthStore } from "@/hooks/use-auth-store"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from "lucide-react"
@@ -17,12 +15,12 @@ const loginSchema = z.object({
 })
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const loginAction = useAuthStore((state) => state.login)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,22 +29,18 @@ export default function LoginPage() {
 
     try {
       loginSchema.parse({ email, password })
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      await loginAction(email, password)
 
-      if (signInError) throw signInError
+      // AuthProvider's navigation guard detects the new session from
+      // the Zustand store and redirects to /dashboard automatically.
       gooeyToast.success("Welcome back!", {
         description: "You have successfully signed in.",
       })
-      router.push("/dashboard")
-      router.refresh()
-    } catch (err) {
-      const error = err as { message?: string }
-      setError(error.message || "An unexpected error occurred.")
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred."
+      setError(message)
       gooeyToast.error("Sign in failed", {
-        description: error.message || "Please check your credentials.",
+        description: message,
       })
     } finally {
       setLoading(false)

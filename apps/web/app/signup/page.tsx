@@ -1,11 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
+// import Image from "next/image"
 import { VisoraHeader } from "@/components/visora-header"
-import { supabase } from "@/lib/supabase"
+import { useAuthStore } from "@/hooks/use-auth-store"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react"
@@ -21,7 +20,6 @@ const signupSchema = z.object({
 })
 
 export default function SignupPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -29,6 +27,7 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const signUpAction = useAuthStore((state) => state.signUp)
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,21 +44,13 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      const { data, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-      })
-
-      if (authError) {
-        setError(authError.message)
-        gooeyToast.error(authError.message)
-      } else if (data.user) {
-        setSuccess(true)
-        gooeyToast.success("Successfully registered!")
-        router.push("/dashboard")
-      }
+      await signUpAction(email, password)
+      setSuccess(true)
+      // AuthProvider's navigation guard detects the new session from
+      // the Zustand store and redirects to /dashboard automatically.
+      gooeyToast.success("Successfully registered!")
     } catch (err: unknown) {
-      const errMsg = (err as { message?: string }).message || "An unexpected error occurred."
+      const errMsg = err instanceof Error ? err.message : "An unexpected error occurred."
       setError(errMsg)
       gooeyToast.error(errMsg)
     } finally {

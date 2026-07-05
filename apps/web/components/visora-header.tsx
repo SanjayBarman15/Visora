@@ -32,6 +32,7 @@ export function VisoraHeader({ minimal = false }: VisoraHeaderProps) {
             width={32}
             height={32}
             className="object-contain"
+            priority
           />
           <span className="font-sans font-bold tracking-tight text-slate-900 dark:text-white text-lg">Visora</span>
         </Link>
