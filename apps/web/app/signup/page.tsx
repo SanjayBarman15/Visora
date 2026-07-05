@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 // import Image from "next/image"
 import { VisoraHeader } from "@/components/visora-header"
@@ -21,7 +20,6 @@ const signupSchema = z.object({
 })
 
 export default function SignupPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -48,8 +46,9 @@ export default function SignupPage() {
     try {
       await signUpAction(email, password)
       setSuccess(true)
+      // AuthProvider's navigation guard detects the new session from
+      // the Zustand store and redirects to /dashboard automatically.
       gooeyToast.success("Successfully registered!")
-      router.push("/dashboard")
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : "An unexpected error occurred."
       setError(errMsg)
