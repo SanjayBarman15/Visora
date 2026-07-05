@@ -2,6 +2,7 @@ import { create } from "zustand"
 
 export interface Message {
   id: string
+  projectId: string
   role: "user" | "assistant"
   content: string
   timestamp: string
@@ -9,9 +10,11 @@ export interface Message {
 
 export interface Scene {
   id: string
+  order: number
   title: string
   description: string
-  duration: number // in seconds
+  duration: number // keep duration for backward compatibility
+  durationSeconds: number
   status: "retrieving" | "generating" | "rendering" | "done" | "error"
   code: string
 }
@@ -19,9 +22,9 @@ export interface Scene {
 export interface Project {
   id: string
   title: string
+  createdAt: string
   lastMessageAt: string
-  status: "draft" | "eliciting" | "plan_review" | "generating" | "assembling" | "done" | "error"
-  scenes: Scene[]
+  status: "draft" | "eliciting" | "plan_review" | "generating" | "assembling" | "done" | "done_with_warnings" | "error"
   activeSceneIndex: number
 }
 
@@ -29,14 +32,18 @@ interface DashboardState {
   sidebarCollapsed: boolean
   projects: Project[]
   activeProjectId: string | null
-  projectMessages: Record<string, Message[]> // Mapping projectId -> messages
+  messages: Message[]
+  scenePlans: Record<string, Scene[]>
   isCodePanelOpen: boolean
   
   // Actions
   toggleSidebar: () => void
   selectProject: (id: string | null) => void
+  setActiveProject: (id: string | null) => void
   startNewProject: (promptText: string) => void
   sendMessage: (content: string) => void
+  addMessage: (projectId: string, message: { id: string; role: Message["role"]; content: string; timestamp: string }) => void
+  updateProjectStatus: (id: string, status: Project["status"]) => void
   toggleCodePanel: () => void
   selectScene: (projectId: string, index: number) => void
   updateScene: (projectId: string, sceneId: string, updates: Partial<Scene>) => void
@@ -149,8 +156,8 @@ const mockMergeSortCode = `class MergeSortDivide(Scene):
         right_half = bars[4:]
         
         self.play(
-            left_half.animate.shift(LEFT * 0.5 + UP * 0.5),
-            right_half.animate.shift(RIGHT * 0.5 + UP * 0.5)
+          left_half.animate.shift(LEFT * 0.5 + UP * 0.5),
+          right_half.animate.shift(RIGHT * 0.5 + UP * 0.5)
         )
         self.wait(1.5)`
 
@@ -159,185 +166,216 @@ const initialProjects: Project[] = [
   {
     id: "proj_1",
     title: "Explain calculus to a 16 year old",
+    createdAt: "2026-07-04T11:58:00Z",
     lastMessageAt: "2026-07-04T12:00:00Z",
     status: "done",
     activeSceneIndex: 0,
-    scenes: [
-      {
-        id: "s1",
-        title: "Introduction to Area",
-        description: "Visualise finding the area under a curve using simple rectangles.",
-        duration: 5,
-        status: "done",
-        code: mockIntroAreaCode,
-      },
-      {
-        id: "s2",
-        title: "Increasing Rectangles",
-        description: "Increase the number of rectangles to show the approximation gets better.",
-        duration: 8,
-        status: "done",
-        code: mockLimitAreaCode,
-      },
-      {
-        id: "s3",
-        title: "Defining the Integral",
-        description: "Transition from summation to the integral sign.",
-        duration: 6,
-        status: "done",
-        code: mockIntegralCode,
-      },
-    ],
   },
   {
     id: "proj_2",
     title: "Fourier transform visual intro",
+    createdAt: "2026-07-04T10:28:00Z",
     lastMessageAt: "2026-07-04T10:30:00Z",
     status: "generating",
     activeSceneIndex: 1,
-    scenes: [
-      {
-        id: "s4",
-        title: "Signal Construction",
-        description: "Define a combination of two sine waves (3Hz and 5Hz).",
-        duration: 4,
-        status: "done",
-        code: "# Plotting wave combination function\\n# f(t) = sin(2*pi*3*t) + sin(2*pi*5*t)",
-      },
-      {
-        id: "s5",
-        title: "Winding Signal around Circle",
-        description: "Wrap the signal around a circle at changing frequencies.",
-        duration: 9,
-        status: "rendering",
-        code: mockFourierCode,
-      },
-      {
-        id: "s6",
-        title: "Plotting Center of Mass",
-        description: "Trace the center of mass x-coordinate to reveal the frequency peaks.",
-        duration: 7,
-        status: "retrieving",
-        code: "# Trace center of mass to plot the final spectrum graph",
-      },
-    ],
   },
   {
     id: "proj_3",
     title: "How merge sort works",
+    createdAt: "2026-07-04T09:12:00Z",
     lastMessageAt: "2026-07-04T09:15:00Z",
     status: "plan_review",
     activeSceneIndex: 0,
-    scenes: [
-      {
-        id: "s7",
-        title: "Unsorted Array View",
-        description: "Show a list of 8 random numbers as vertical colored bars.",
-        duration: 4,
-        status: "done",
-        code: mockMergeSortCode,
-      },
-      {
-        id: "s8",
-        title: "Divide Phase",
-        description: "Recursively split the array into halves until single elements remain.",
-        duration: 8,
-        status: "done",
-        code: mockMergeSortCode,
-      },
-      {
-        id: "s9",
-        title: "Conquer & Merge",
-        description: "Compare and merge elements back together in sorted order.",
-        duration: 10,
-        status: "done",
-        code: mockMergeSortCode,
-      },
-    ],
   },
 ]
 
-const initialMessages: Record<string, Message[]> = {
+const initialScenePlans: Record<string, Scene[]> = {
   proj_1: [
     {
-      id: "m1",
-      role: "user",
-      content: "Explain calculus to a 16 year old in an visual, intuitive way.",
-      timestamp: "2026-07-04T11:58:00Z",
+      id: "s1",
+      order: 1,
+      title: "Introduction to Area",
+      description: "Visualise finding the area under a curve using simple rectangles.",
+      duration: 5,
+      durationSeconds: 5,
+      status: "done",
+      code: mockIntroAreaCode,
     },
     {
-      id: "m2",
-      role: "assistant",
-      content:
-        "Hi! I'm Scout, your Visora design assistant. I've mapped this out into a Riemann sum visualization. The scenes have been rendered successfully and the final video is assembled. You can view the output and inspect the Manim code in the right panel.",
-      timestamp: "2026-07-04T12:00:00Z",
+      id: "s2",
+      order: 2,
+      title: "Increasing Rectangles",
+      description: "Increase the number of rectangles to show the approximation gets better.",
+      duration: 8,
+      durationSeconds: 8,
+      status: "done",
+      code: mockLimitAreaCode,
+    },
+    {
+      id: "s3",
+      order: 3,
+      title: "Defining the Integral",
+      description: "Transition from summation to the integral sign.",
+      duration: 6,
+      durationSeconds: 6,
+      status: "done",
+      code: mockIntegralCode,
     },
   ],
   proj_2: [
     {
-      id: "m3",
-      role: "user",
-      content: "Show the Fourier transform by wrapping a signal around a circle.",
-      timestamp: "2026-07-04T10:28:00Z",
+      id: "s4",
+      order: 1,
+      title: "Signal Construction",
+      description: "Define a combination of two sine waves (3Hz and 5Hz).",
+      duration: 4,
+      durationSeconds: 4,
+      status: "done",
+      code: "# Plotting wave combination function\n# f(t) = sin(2*pi*3*t) + sin(2*pi*5*t)",
     },
     {
-      id: "m4",
-      role: "assistant",
-      content:
-        "Great idea. I'll configure the Manim agent to generate a coordinate circle and plot the signal winding frequency in real-time. The generator is currently compiling the rendering pipeline.",
-      timestamp: "2026-07-04T10:30:00Z",
+      id: "s5",
+      order: 2,
+      title: "Winding Signal around Circle",
+      description: "Wrap the signal around a circle at changing frequencies.",
+      duration: 9,
+      durationSeconds: 9,
+      status: "rendering",
+      code: mockFourierCode,
+    },
+    {
+      id: "s6",
+      order: 3,
+      title: "Plotting Center of Mass",
+      description: "Trace the center of mass x-coordinate to reveal the frequency peaks.",
+      duration: 7,
+      durationSeconds: 7,
+      status: "retrieving",
+      code: "# Trace center of mass to plot the final spectrum graph",
     },
   ],
   proj_3: [
     {
-      id: "m5",
-      role: "user",
-      content: "A quick tutorial explaining the divide-and-conquer strategy in merge sort.",
-      timestamp: "2026-07-04T09:12:00Z",
+      id: "s7",
+      order: 1,
+      title: "Unsorted Array View",
+      description: "Show a list of 8 random numbers as vertical colored bars.",
+      duration: 4,
+      durationSeconds: 4,
+      status: "done",
+      code: mockMergeSortCode,
     },
     {
-      id: "m6",
-      role: "assistant",
-      content:
-        "Hello! I have created the preliminary scene outline for your Merge Sort animation. Please review the plan below, edit any descriptions or durations as you see fit, and click 'Approve & Start Generation' when you are ready to render.",
-      timestamp: "2026-07-04T09:15:00Z",
+      id: "s8",
+      order: 2,
+      title: "Divide Phase",
+      description: "Recursively split the array into halves until single elements remain.",
+      duration: 8,
+      durationSeconds: 8,
+      status: "done",
+      code: mockMergeSortCode,
+    },
+    {
+      id: "s9",
+      order: 3,
+      title: "Conquer & Merge",
+      description: "Compare and merge elements back together in sorted order.",
+      duration: 10,
+      durationSeconds: 10,
+      status: "done",
+      code: mockMergeSortCode,
     },
   ],
 }
+
+const initialMessages: Message[] = [
+  {
+    id: "m1",
+    projectId: "proj_1",
+    role: "user",
+    content: "Explain calculus to a 16 year old in an visual, intuitive way.",
+    timestamp: "2026-07-04T11:58:00Z",
+  },
+  {
+    id: "m2",
+    projectId: "proj_1",
+    role: "assistant",
+    content:
+      "Hi! I'm Scout, your Visora design assistant. I've mapped this out into a Riemann sum visualization. The scenes have been rendered successfully and the final video is assembled. You can view the output and inspect the Manim code in the right panel.",
+    timestamp: "2026-07-04T12:00:00Z",
+  },
+  {
+    id: "m3",
+    projectId: "proj_2",
+    role: "user",
+    content: "Show the Fourier transform by wrapping a signal around a circle.",
+    timestamp: "2026-07-04T10:28:00Z",
+  },
+  {
+    id: "m4",
+    projectId: "proj_2",
+    role: "assistant",
+    content:
+      "Great idea. I'll configure the Manim agent to generate a coordinate circle and plot the signal winding frequency in real-time. The generator is currently compiling the rendering pipeline.",
+    timestamp: "2026-07-04T10:30:00Z",
+  },
+  {
+    id: "m5",
+    projectId: "proj_3",
+    role: "user",
+    content: "A quick tutorial explaining the divide-and-conquer strategy in merge sort.",
+    timestamp: "2026-07-04T09:12:00Z",
+  },
+  {
+    id: "m6",
+    projectId: "proj_3",
+    role: "assistant",
+    content:
+      "Hello! I have created the preliminary scene outline for your Merge Sort animation. Please review the plan below, edit any descriptions or durations as you see fit, and click 'Approve & Start Generation' when you are ready to render.",
+    timestamp: "2026-07-04T09:15:00Z",
+  },
+]
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
   sidebarCollapsed: false,
   projects: initialProjects,
   activeProjectId: null,
-  projectMessages: initialMessages,
+  messages: initialMessages,
+  scenePlans: initialScenePlans,
   isCodePanelOpen: false,
 
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
   selectProject: (id) => set({ activeProjectId: id }),
+  setActiveProject: (id) => set({ activeProjectId: id }),
 
   startNewProject: (promptText) => {
     const newId = `proj_${Date.now()}`
     const newProject: Project = {
       id: newId,
       title: promptText.length > 40 ? promptText.slice(0, 37) + "..." : promptText,
+      createdAt: new Date().toISOString(),
       lastMessageAt: new Date().toISOString(),
       status: "eliciting",
       activeSceneIndex: 0,
-      scenes: [
-        {
-          id: `s_new_1`,
-          title: "Introduction",
-          description: `Visualise the core concept: "${promptText}"`,
-          duration: 5,
-          status: "done",
-          code: `# Auto-generated starter template for ${promptText}`,
-        },
-      ],
     }
+
+    const starterScenes: Scene[] = [
+      {
+        id: `s_${newId}_starter`,
+        order: 1,
+        title: "Introduction",
+        description: `Visualise the core concept: "${promptText}"`,
+        duration: 5,
+        durationSeconds: 5,
+        status: "done",
+        code: `# Auto-generated starter template for ${promptText}`,
+      },
+    ]
 
     const userMessage: Message = {
       id: `m_user_${Date.now()}`,
+      projectId: newId,
       role: "user",
       content: promptText,
       timestamp: new Date().toISOString(),
@@ -346,9 +384,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     set((state) => ({
       projects: [newProject, ...state.projects],
       activeProjectId: newId,
-      projectMessages: {
-        ...state.projectMessages,
-        [newId]: [userMessage],
+      messages: [...state.messages, userMessage],
+      scenePlans: {
+        ...state.scenePlans,
+        [newId]: starterScenes,
       },
     }))
 
@@ -356,6 +395,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     setTimeout(() => {
       const assistantMessage: Message = {
         id: `m_ast_${Date.now()}`,
+        projectId: newId,
         role: "assistant",
         content: `I've constructed a proposed scene outline for your topic: "${promptText}". You can see it below. I've designed three main visual stages: an introduction to establish the concepts, a main visual deep-dive showing the core mechanics, and a final summary. Please review and click Approve to generate!`,
         timestamp: new Date().toISOString(),
@@ -363,42 +403,47 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
       set((state) => {
         const updatedProjects = state.projects.map((p) =>
-          p.id === newId ? { 
-            ...p, 
-            status: "plan_review" as const,
-            scenes: [
-              {
-                id: `s_${newId}_1`,
-                title: "Introduction & Setup",
-                description: `Define and setup the basic visual grid for: ${promptText}.`,
-                duration: 5,
-                status: "done" as const,
-                code: `# Code block for setup`,
-              },
-              {
-                id: `s_${newId}_2`,
-                title: "Core Mechanics Demonstration",
-                description: "Dynamic visual transformation illustrating the core formula/logic.",
-                duration: 10,
-                status: "done" as const,
-                code: `# Code block for core visuals`,
-              },
-              {
-                id: `s_${newId}_3`,
-                title: "Mathematical Summary",
-                description: "Write out final equations and summarize with highlighting overlays.",
-                duration: 6,
-                status: "done" as const,
-                code: `# Code block for math overlay`,
-              }
-            ]
-          } : p
+          p.id === newId ? { ...p, status: "plan_review" as const } : p
         )
+        const outlineScenes: Scene[] = [
+          {
+            id: `s_${newId}_1`,
+            order: 1,
+            title: "Introduction & Setup",
+            description: `Define and setup the basic visual grid for: ${promptText}.`,
+            duration: 5,
+            durationSeconds: 5,
+            status: "done" as const,
+            code: `# Code block for setup`,
+          },
+          {
+            id: `s_${newId}_2`,
+            order: 2,
+            title: "Core Mechanics Demonstration",
+            description: "Dynamic visual transformation illustrating the core formula/logic.",
+            duration: 10,
+            durationSeconds: 10,
+            status: "done" as const,
+            code: `# Code block for core visuals`,
+          },
+          {
+            id: `s_${newId}_3`,
+            order: 3,
+            title: "Mathematical Summary",
+            description: "Write out final equations and summarize with highlighting overlays.",
+            duration: 6,
+            durationSeconds: 6,
+            status: "done" as const,
+            code: `# Code block for math overlay`,
+          }
+        ]
+
         return {
           projects: updatedProjects,
-          projectMessages: {
-            ...state.projectMessages,
-            [newId]: [...(state.projectMessages[newId] || []), assistantMessage],
+          messages: [...state.messages, assistantMessage],
+          scenePlans: {
+            ...state.scenePlans,
+            [newId]: outlineScenes,
           },
         }
       })
@@ -411,34 +456,46 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
     const userMessage: Message = {
       id: `m_user_${Date.now()}`,
+      projectId: activeProjectId,
       role: "user",
       content,
       timestamp: new Date().toISOString(),
     }
 
     set((state) => ({
-      projectMessages: {
-        ...state.projectMessages,
-        [activeProjectId]: [...(state.projectMessages[activeProjectId] || []), userMessage],
-      },
+      messages: [...state.messages, userMessage],
     }))
 
     // Simulate assistant response
     setTimeout(() => {
       const assistantMessage: Message = {
         id: `m_ast_${Date.now()}`,
+        projectId: activeProjectId,
         role: "assistant",
         content: `Got it. I'm updating the outline parameters. Let me know if the updated scene plan looks good or if we should tweak anything else.`,
         timestamp: new Date().toISOString(),
       }
 
       set((state) => ({
-        projectMessages: {
-          ...state.projectMessages,
-          [activeProjectId]: [...(state.projectMessages[activeProjectId] || []), assistantMessage],
-        },
+        messages: [...state.messages, assistantMessage],
       }))
     }, 1200)
+  },
+
+  addMessage: (projectId, message) => {
+    const fullMessage: Message = {
+      ...message,
+      projectId,
+    }
+    set((state) => ({
+      messages: [...state.messages, fullMessage],
+    }))
+  },
+
+  updateProjectStatus: (id, status) => {
+    set((state) => ({
+      projects: state.projects.map((p) => (p.id === id ? { ...p, status } : p)),
+    }))
   },
 
   toggleCodePanel: () => set((state) => ({ isCodePanelOpen: !state.isCodePanelOpen })),
@@ -452,44 +509,62 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
 
   updateScene: (projectId, sceneId, updates) => {
-    set((state) => ({
-      projects: state.projects.map((p) => {
-        if (p.id !== projectId) return p
+    set((state) => {
+      const scenes = state.scenePlans[projectId] || []
+      const updatedScenes = scenes.map((s) => {
+        if (s.id !== sceneId) return s
+        const nextDuration = updates.duration !== undefined ? updates.duration : (updates.durationSeconds !== undefined ? updates.durationSeconds : s.duration)
         return {
-          ...p,
-          scenes: p.scenes.map((s) => (s.id === sceneId ? { ...s, ...updates } : s)),
+          ...s,
+          ...updates,
+          duration: nextDuration,
+          durationSeconds: nextDuration,
         }
-      }),
-    }))
+      })
+      return {
+        scenePlans: {
+          ...state.scenePlans,
+          [projectId]: updatedScenes,
+        },
+      }
+    })
   },
 
   reorderScenes: (projectId, startIndex, endIndex) => {
-    set((state) => ({
-      projects: state.projects.map((p) => {
-        if (p.id !== projectId) return p
-        const result = Array.from(p.scenes)
-        const [removed] = result.splice(startIndex, 1)
-        result.splice(endIndex, 0, removed)
-        return {
-          ...p,
-          scenes: result,
-        }
-      }),
-    }))
+    set((state) => {
+      const scenes = state.scenePlans[projectId] || []
+      const result = Array.from(scenes)
+      const [removed] = result.splice(startIndex, 1)
+      result.splice(endIndex, 0, removed)
+      // Recalculate orders
+      const updated = result.map((s, idx) => ({ ...s, order: idx + 1 }))
+      return {
+        scenePlans: {
+          ...state.scenePlans,
+          [projectId]: updated,
+        },
+      }
+    })
   },
 
   deleteScene: (projectId, sceneId) => {
-    set((state) => ({
-      projects: state.projects.map((p) => {
-        if (p.id !== projectId) return p
-        const updatedScenes = p.scenes.filter((s) => s.id !== sceneId)
-        return {
-          ...p,
-          scenes: updatedScenes,
-          activeSceneIndex: Math.min(p.activeSceneIndex, updatedScenes.length - 1),
-        }
-      }),
-    }))
+    set((state) => {
+      const scenes = state.scenePlans[projectId] || []
+      const updatedScenes = scenes.filter((s) => s.id !== sceneId).map((s, idx) => ({ ...s, order: idx + 1 }))
+      return {
+        scenePlans: {
+          ...state.scenePlans,
+          [projectId]: updatedScenes,
+        },
+        projects: state.projects.map((p) => {
+          if (p.id !== projectId) return p
+          return {
+            ...p,
+            activeSceneIndex: Math.min(p.activeSceneIndex, updatedScenes.length - 1),
+          }
+        }),
+      }
+    })
   },
 
   approvePlan: (projectId) => {
@@ -512,39 +587,43 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
     steps.forEach((stepStatuses, index) => {
       setTimeout(() => {
-        set((state) => ({
-          projects: state.projects.map((p) => {
-            if (p.id !== projectId) return p
-            const updatedScenes = p.scenes.map((s, idx) => ({
-              ...s,
-              status: stepStatuses[idx] || "done",
-              code: idx === 0 ? mockIntroAreaCode : idx === 1 ? mockLimitAreaCode : mockIntegralCode
-            }))
-            
-            // Check if final step (all done) -> transition project status to assembling then done
-            const isAllDone = stepStatuses.every((s) => s === "done")
-            let newStatus = p.status
-            if (isAllDone) {
-              newStatus = "assembling"
-              // Quickly assemble and transition to done
-              setTimeout(() => {
-                set((state2) => ({
-                  projects: state2.projects.map((p2) =>
-                    p2.id === projectId ? { ...p2, status: "done" as const } : p2
-                  ),
-                }))
-              }, 1500)
-            } else {
-              newStatus = "generating"
-            }
-
+        set((state) => {
+          const scenes = state.scenePlans[projectId] || []
+          const updatedScenes = scenes.map((s, idx) => {
+            const nextStatus = stepStatuses[idx] || "done"
             return {
-              ...p,
-              status: newStatus,
-              scenes: updatedScenes,
+              ...s,
+              status: nextStatus,
+              code: idx === 0 ? mockIntroAreaCode : idx === 1 ? mockLimitAreaCode : mockIntegralCode
             }
-          }),
-        }))
+          })
+          
+          // Check if final step (all done) -> transition project status to assembling then done
+          const isAllDone = stepStatuses.every((s) => s === "done")
+          let newStatus: Project["status"] = "generating"
+          
+          if (isAllDone) {
+            newStatus = "assembling"
+            // Quickly assemble and transition to done
+            setTimeout(() => {
+              set((state2) => ({
+                projects: state2.projects.map((p2) =>
+                  p2.id === projectId ? { ...p2, status: "done" as const } : p2
+                ),
+              }))
+            }, 1500)
+          }
+
+          return {
+            scenePlans: {
+              ...state.scenePlans,
+              [projectId]: updatedScenes,
+            },
+            projects: state.projects.map((p) =>
+              p.id === projectId ? { ...p, status: isAllDone ? "assembling" as const : "generating" as const } : p
+            ),
+          }
+        })
       }, (index + 1) * 2000)
     })
   },

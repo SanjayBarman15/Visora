@@ -32,6 +32,12 @@ export function DashboardHeader() {
             done
           </Badge>
         )
+      case "done_with_warnings":
+        return (
+          <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-500 dark:border-amber-900/60 font-mono text-[9px] h-4 px-1.5 py-0">
+            warnings
+          </Badge>
+        )
       case "generating":
         return (
           <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/60 font-mono text-[9px] h-4 px-1.5 py-0 animate-pulse">

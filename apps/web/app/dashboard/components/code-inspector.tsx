@@ -10,6 +10,7 @@ export function CodeInspector() {
   const {
     activeProjectId,
     projects,
+    scenePlans,
     isCodePanelOpen,
     toggleCodePanel,
   } = useDashboardStore()
@@ -17,7 +18,8 @@ export function CodeInspector() {
   const activeProject = projects.find((p) => p.id === activeProjectId)
   if (!activeProject) return null
 
-  const activeScene = activeProject.scenes?.[activeProject.activeSceneIndex]
+  const scenes = activeProjectId ? scenePlans[activeProjectId] || [] : []
+  const activeScene = scenes[activeProject.activeSceneIndex]
 
   return (
     <div 

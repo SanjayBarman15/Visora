@@ -13,11 +13,11 @@ export function ChatPanel() {
 
   const {
     activeProjectId,
-    projectMessages,
+    messages,
     sendMessage,
   } = useDashboardStore()
 
-  const activeMessages = activeProjectId ? projectMessages[activeProjectId] || [] : []
+  const activeMessages = activeProjectId ? messages.filter((m) => m.projectId === activeProjectId) : []
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" })

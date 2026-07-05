@@ -19,7 +19,8 @@ export function PlanReview() {
   const {
     activeProjectId,
     projects,
-    projectMessages,
+    messages,
+    scenePlans,
     sendMessage,
     updateScene,
     reorderScenes,
@@ -28,7 +29,8 @@ export function PlanReview() {
   } = useDashboardStore()
 
   const activeProject = projects.find((p) => p.id === activeProjectId)
-  const activeMessages = activeProjectId ? projectMessages[activeProjectId] || [] : []
+  const activeMessages = activeProjectId ? messages.filter((m) => m.projectId === activeProjectId) : []
+  const scenes = activeProjectId ? scenePlans[activeProjectId] || [] : []
 
   if (!activeProject) return null
 
@@ -107,7 +109,7 @@ export function PlanReview() {
           </div>
 
           <div className="space-y-4">
-            {activeProject.scenes?.map((scene, idx) => (
+            {scenes.map((scene, idx) => (
               <div
                 key={scene.id}
                 className="bg-white dark:bg-card border border-slate-200 dark:border-border rounded-xl p-4.5 shadow-sm dark:shadow-md flex gap-4 items-start hover:border-sky-300 dark:hover:border-slate-800 hover:shadow-md dark:hover:shadow-md transition-all"
@@ -129,7 +131,7 @@ export function PlanReview() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      disabled={idx === (activeProject.scenes.length - 1)}
+                      disabled={idx === (scenes.length - 1)}
                       onClick={() => reorderScenes(activeProject.id, idx, idx + 1)}
                       className="w-5 h-5 text-slate-400 hover:text-slate-700 dark:hover:text-white disabled:opacity-30 cursor-pointer"
                     >

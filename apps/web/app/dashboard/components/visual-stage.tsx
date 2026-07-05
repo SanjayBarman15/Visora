@@ -21,6 +21,7 @@ export function VisualStage() {
   const {
     activeProjectId,
     projects,
+    scenePlans,
     isCodePanelOpen,
     toggleCodePanel,
     selectScene,
@@ -30,7 +31,8 @@ export function VisualStage() {
   const activeProject = projects.find((p) => p.id === activeProjectId)
   if (!activeProject) return null
 
-  const activeScene = activeProject.scenes?.[activeProject.activeSceneIndex]
+  const scenes = activeProjectId ? scenePlans[activeProjectId] || [] : []
+  const activeScene = scenes[activeProject.activeSceneIndex]
 
   const getSceneStatusComponent = (status: Scene["status"]) => {
     switch (status) {
@@ -151,7 +153,7 @@ export function VisualStage() {
             </div>
 
             <div className="space-y-4">
-              {activeProject.scenes?.map((scene, idx) => (
+              {scenes.map((scene, idx) => (
                 <div key={scene.id} className="space-y-1 bg-slate-50 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900/60 rounded-xl p-3">
                   <div className="flex justify-between items-center text-xs">
                     <span className="font-bold text-slate-700 dark:text-slate-350 flex items-center gap-2">
@@ -254,7 +256,7 @@ export function VisualStage() {
                 Select Scene to Inspect
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {activeProject.scenes?.map((scene, idx) => {
+                {scenes.map((scene, idx) => {
                   const isSelected = activeProject.activeSceneIndex === idx
                   return (
                     <button
