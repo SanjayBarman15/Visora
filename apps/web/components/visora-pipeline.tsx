@@ -1,17 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+// import { motion } from "framer-motion"
 import { 
   Users, MessageSquare, ListTodo, Code, ShieldCheck, 
-  FileText, Volume2, Music, History, ArrowRight, RefreshCw 
+  FileText, Volume2, Music, History,  RefreshCw 
 } from "lucide-react"
 
 interface AgentStep {
   num: string
   title: string
   subtitle: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   color: string
   description: string
   badge?: string
@@ -90,7 +90,7 @@ export function VisoraPipeline() {
   ]
 
   return (
-    <section className="relative bg-[#05070a] py-24 border-b border-slate-900 overflow-hidden">
+    <section className="relative bg-background py-24 border-b border-border overflow-hidden">
       {/* Visual background details */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-900/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -100,10 +100,10 @@ export function VisoraPipeline() {
             <Users className="w-3.5 h-3.5" />
             MULTI-AGENT ORCHESTRATION
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-6">
             Under the Hood: The 8-Agent Pipeline
           </h2>
-          <p className="text-slate-400 leading-relaxed font-sans">
+          <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
             Visora doesn&apos;t just guess pixels. Eight specialized AI agents coordinate in a sandboxed, 
             self-correcting environment to write actual code and sync voiceovers.
           </p>
@@ -118,8 +118,8 @@ export function VisoraPipeline() {
             return (
               <div 
                 key={step.num}
-                className={`relative group rounded-xl border p-6 transition-all duration-300 bg-slate-950/40 backdrop-blur-sm cursor-pointer select-none
-                  ${isActive ? "border-slate-700 bg-slate-950/80 shadow-lg" : "border-slate-900 hover:border-slate-800"}`}
+                className={`relative group rounded-xl border p-6 transition-all duration-300 bg-white dark:bg-slate-950/40 backdrop-blur-sm cursor-pointer select-none
+                  ${isActive ? "border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/80 shadow-lg" : "border-slate-200 dark:border-slate-900 hover:border-slate-350 dark:hover:border-slate-800"}`}
                 onMouseEnter={() => setActiveStep(idx)}
                 onMouseLeave={() => setActiveStep(null)}
               >
@@ -139,7 +139,7 @@ export function VisoraPipeline() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-md font-bold text-white mb-1 group-hover:text-sky-400 transition-colors">
+                <h3 className="text-md font-bold text-slate-900 dark:text-white mb-1 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
                   {step.title}
                 </h3>
                 <p className="text-xs font-mono text-slate-500 mb-4 uppercase tracking-wider">
@@ -161,7 +161,7 @@ export function VisoraPipeline() {
                   </div>
                 )}
 
-                <p className="text-sm text-slate-400 leading-relaxed font-sans">
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
                   {step.description}
                 </p>
               </div>
@@ -170,7 +170,7 @@ export function VisoraPipeline() {
         </div>
 
         {/* Self-Healing Loop Highlight Box */}
-        <div className="mt-12 max-w-4xl mx-auto rounded-xl border border-rose-950/40 bg-rose-950/5 p-6 flex flex-col md:flex-row items-center gap-6">
+        <div className="mt-12 max-w-4xl mx-auto rounded-xl border border-rose-500/20 dark:border-rose-950/40 bg-rose-500/5 dark:bg-rose-950/5 p-6 flex flex-col md:flex-row items-center gap-6">
           <div className="p-3 rounded-xl border border-rose-500/20 bg-rose-950/30 text-rose-400 shrink-0">
             <RefreshCw className="w-8 h-8 animate-spin" style={{ animationDuration: '4s' }} />
           </div>
@@ -179,7 +179,7 @@ export function VisoraPipeline() {
               <h4 className="text-sm font-mono font-bold text-rose-400 uppercase tracking-wide">Dynamic Code Healing (Manim Compiler loop)</h4>
               <span className="bg-rose-500/20 text-rose-400 text-[10px] font-mono px-2 py-0.5 rounded border border-rose-500/20">Critical Differentiator</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed font-sans">
+            <p className="text-sm text-slate-650 dark:text-slate-400 leading-relaxed font-sans">
               LLMs often write broken Python code. Visora solves this by wrapping the <strong>Manim Code Writer</strong> and <strong>Code Reviewer</strong> in a tight compile-and-fix feedback loop. The compiler intercepts syntax bugs, type errors, and boundary issues, fixing them before the video renders. You receive perfect, running Python animation code.
             </p>
           </div>

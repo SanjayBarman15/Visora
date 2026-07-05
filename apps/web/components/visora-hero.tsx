@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Play, Pause, RotateCcw, Sliders, Code2, Sparkles, ArrowRight } from "lucide-react"
+import { Play, Pause, RotateCcw, Code2, Sparkles, ArrowRight } from "lucide-react"
 
 export function VisoraHero() {
   const [isPlaying, setIsPlaying] = useState(true)
@@ -116,14 +116,14 @@ class FourierSquareWave(Scene):
   }
 
   return (
-    <section className="relative overflow-hidden border-b border-slate-900 bg-[#07090e] pt-20 pb-24 md:pt-28 md:pb-32">
+    <section className="relative overflow-hidden border-b border-slate-200 dark:border-slate-900 bg-slate-50 dark:bg-[#07090e] pt-20 pb-24 md:pt-28 md:pb-32">
       {/* Precision Grid Background */}
       <div 
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04] pointer-events-none text-slate-900 dark:text-slate-100"
         style={{
           backgroundImage: `
-            linear-gradient(to right, #ffffff 1px, transparent 1px),
-            linear-gradient(to bottom, #ffffff 1px, transparent 1px)
+            linear-gradient(to right, currentColor 1px, transparent 1px),
+            linear-gradient(to bottom, currentColor 1px, transparent 1px)
           `,
           backgroundSize: "40px 40px",
         }}
@@ -138,28 +138,28 @@ class FourierSquareWave(Scene):
           </div>
 
           {/* Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 font-sans">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 font-sans">
             Mathematical explainer videos, <br className="hidden sm:inline" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-emerald-400 to-yellow-400">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-500 via-emerald-500 to-amber-500">
               generated from a single prompt.
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg text-slate-400 max-w-2xl mb-8 leading-relaxed font-sans">
+          <p className="text-lg text-slate-650 dark:text-slate-400 max-w-2xl mb-8 leading-relaxed font-sans">
             Visora orchestrates specialized AI agents to plan, code, self-correct, and render 
             mathematically rigorous explainer videos in Python Manim. No keyframes. No pixel slop. Just pure geometry and code.
           </p>
 
           {/* Quick Prompt Bar */}
-          <div className="w-full max-w-2xl bg-slate-950/80 border border-slate-800 rounded-xl p-2.5 flex flex-col sm:flex-row gap-2 shadow-2xl backdrop-blur-md">
+          <div className="w-full max-w-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 flex flex-col sm:flex-row gap-2 shadow-2xl backdrop-blur-md">
             <div className="flex-1 flex items-center gap-3 px-3">
-              <Sparkles className="w-5 h-5 text-sky-400 shrink-0" />
+              <Sparkles className="w-5 h-5 text-sky-500 shrink-0" />
               <input 
                 type="text"
                 value={promptText}
                 onChange={(e) => setPromptText(e.target.value)}
-                className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none font-sans"
+                className="w-full bg-transparent text-sm text-slate-850 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none font-sans"
                 placeholder="Describe a scientific or math concept..."
               />
             </div>
@@ -176,45 +176,45 @@ class FourierSquareWave(Scene):
         </div>
 
         {/* The Manim Simulator Split Screen */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto bg-slate-950/60 border border-slate-900 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto bg-white/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md">
           
           {/* Left panel: Code Editor / Controls */}
-          <div className="lg:col-span-5 flex flex-col border-r border-slate-900 bg-[#090d14]/80">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-900 bg-slate-950/60">
+          <div className="lg:col-span-5 flex flex-col border-r border-slate-200 dark:border-slate-900 bg-slate-50/80 dark:bg-[#090d14]/80">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-900 bg-slate-100/60 dark:bg-slate-950/60">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1.5">
                   <span className="w-3 h-3 rounded-full bg-rose-500/80" />
                   <span className="w-3 h-3 rounded-full bg-amber-500/80" />
                   <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
                 </div>
-                <span className="ml-2 text-xs font-mono text-slate-400 flex items-center gap-1.5">
-                  <Code2 className="w-3.5 h-3.5 text-sky-400" />
+                <span className="ml-2 text-xs font-mono text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Code2 className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400" />
                   scene_renderer.py
                 </span>
               </div>
-              <div className="flex bg-slate-900/50 p-0.5 rounded-lg border border-slate-800">
+              <div className="flex bg-slate-200/50 dark:bg-slate-900/50 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800">
                 <button 
                   onClick={() => setActiveTab("visualizer")}
-                  className={`px-2.5 py-1 text-xs font-mono rounded cursor-pointer ${activeTab === "visualizer" ? "bg-slate-800 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                  className={`px-2.5 py-1 text-xs font-mono rounded cursor-pointer ${activeTab === "visualizer" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-350"}`}
                 >
                   Controls
                 </button>
                 <button 
                   onClick={() => setActiveTab("code")}
-                  className={`px-2.5 py-1 text-xs font-mono rounded cursor-pointer ${activeTab === "code" ? "bg-slate-800 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                  className={`px-2.5 py-1 text-xs font-mono rounded cursor-pointer ${activeTab === "code" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-350"}`}
                 >
                   Code
                 </button>
               </div>
             </div>
 
-            {/* Panel Body */}
+             {/* Panel Body */}
             {activeTab === "visualizer" ? (
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xs font-mono text-slate-400 uppercase tracking-wider mb-3">Live Simulation Inputs</h3>
-                    <p className="text-sm text-slate-400 mb-4 font-sans">
+                    <h3 className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Live Simulation Inputs</h3>
+                    <p className="text-sm text-slate-650 dark:text-slate-400 mb-4 font-sans">
                       Modify mathematical parameters and watch the vector projections adjust in real-time. This is the exact canvas Visora builds behind the scenes.
                     </p>
                   </div>
@@ -222,8 +222,8 @@ class FourierSquareWave(Scene):
                   {/* Slider: Harmonics */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-slate-400">Fourier Harmonics (Complexity)</span>
-                      <span className="text-amber-400 font-bold">{harmonics} terms</span>
+                      <span className="text-slate-500 dark:text-slate-400">Fourier Harmonics (Complexity)</span>
+                      <span className="text-amber-500 dark:text-amber-400 font-bold">{harmonics} terms</span>
                     </div>
                     <input 
                       type="range" 
@@ -231,9 +231,9 @@ class FourierSquareWave(Scene):
                       max="8" 
                       value={harmonics}
                       onChange={(e) => setHarmonics(parseInt(e.target.value))}
-                      className="w-full accent-amber-400 bg-slate-900 h-1.5 rounded-lg cursor-pointer"
+                      className="w-full accent-amber-500 dark:accent-amber-400 bg-slate-200 dark:bg-slate-900 h-1.5 rounded-lg cursor-pointer"
                     />
-                    <div className="flex justify-between text-[10px] text-slate-600 font-mono">
+                    <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-600 font-mono">
                       <span>Simple (1 circle)</span>
                       <span>Complex (8 circles)</span>
                     </div>
@@ -242,8 +242,8 @@ class FourierSquareWave(Scene):
                   {/* Slider: Speed */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-slate-400">Time Execution Speed</span>
-                      <span className="text-emerald-400 font-bold">{speed.toFixed(1)}x</span>
+                      <span className="text-slate-500 dark:text-slate-400">Time Execution Speed</span>
+                      <span className="text-emerald-500 dark:text-emerald-400 font-bold">{speed.toFixed(1)}x</span>
                     </div>
                     <input 
                       type="range" 
@@ -252,7 +252,7 @@ class FourierSquareWave(Scene):
                       step="0.1"
                       value={speed}
                       onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                      className="w-full accent-emerald-400 bg-slate-900 h-1.5 rounded-lg cursor-pointer"
+                      className="w-full accent-emerald-500 dark:accent-emerald-400 bg-slate-200 dark:bg-slate-900 h-1.5 rounded-lg cursor-pointer"
                     />
                   </div>
 
@@ -263,30 +263,30 @@ class FourierSquareWave(Scene):
                         type="checkbox" 
                         checked={showGrid}
                         onChange={(e) => setShowGrid(e.target.checked)}
-                        className="rounded border-slate-800 bg-slate-900 text-sky-500 focus:ring-0 w-4 h-4"
+                        className="rounded border-slate-300 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-sky-500 focus:ring-0 w-4 h-4"
                       />
-                      <span className="text-xs font-mono text-slate-400">Axes & Grid</span>
+                      <span className="text-xs font-mono text-slate-500 dark:text-slate-400">Axes & Grid</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input 
                         type="checkbox" 
                         checked={showVectors}
                         onChange={(e) => setShowVectors(e.target.checked)}
-                        className="rounded border-slate-800 bg-slate-900 text-sky-500 focus:ring-0 w-4 h-4"
+                        className="rounded border-slate-300 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-sky-500 focus:ring-0 w-4 h-4"
                       />
-                      <span className="text-xs font-mono text-slate-400">Vector Arrows</span>
+                      <span className="text-xs font-mono text-slate-500 dark:text-slate-400">Vector Arrows</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Bottom player controls */}
-                <div className="flex items-center justify-between border-t border-slate-900/80 pt-6 mt-8">
+                <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-900/80 pt-6 mt-8">
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
                       variant="secondary"
                       onClick={() => setIsPlaying(!isPlaying)}
-                      className="bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 cursor-pointer"
+                      className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-250 dark:border-slate-800 cursor-pointer"
                     >
                       {isPlaying ? <Pause className="w-4 h-4 mr-1.5" /> : <Play className="w-4 h-4 mr-1.5" />}
                       {isPlaying ? "Pause" : "Play"}
@@ -295,7 +295,7 @@ class FourierSquareWave(Scene):
                       size="sm" 
                       variant="ghost"
                       onClick={handleReset}
-                      className="text-slate-400 hover:text-white cursor-pointer"
+                      className="text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white cursor-pointer"
                     >
                       <RotateCcw className="w-4 h-4 mr-1.5" />
                       Reset
@@ -318,44 +318,51 @@ class FourierSquareWave(Scene):
             )}
           </div>
 
-          {/* Right panel: Live Manim Math Canvas */}
-          <div className="lg:col-span-7 flex flex-col bg-[#0b0e14]">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-900 bg-slate-950/20">
-              <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-emerald-400" />
-                Manim Render Canvas
+          {/* Right panel: Live Manim Viewport */}
+          <div className="lg:col-span-7 flex flex-col justify-between bg-white dark:bg-slate-950 relative min-h-[350px]">
+            
+            {/* Viewport Header */}
+            <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-slate-900/80">
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                Live Math Visualizer
               </span>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-mono text-slate-500">60 FPS</span>
-              </div>
+              <span className="text-[10px] font-mono text-slate-450 dark:text-slate-500">60 FPS &bull; WebGL Accelerated</span>
             </div>
 
-            {/* SVG Render Workspace */}
-            <div className="relative flex-1 min-h-[350px] flex items-center justify-center overflow-hidden p-6">
-              
-              {/* Custom mathematical background axes */}
+            {/* Viewport Canvas (SVG Simulation) */}
+            <div className="flex-1 flex items-center justify-center p-6 relative overflow-hidden bg-slate-50/50 dark:bg-slate-950">
+              {/* Math Grid lines representation */}
               {showGrid && (
-                <div className="absolute inset-0 pointer-events-none opacity-30">
-                  {/* Central Axes */}
-                  <div className="absolute left-[35%] top-0 bottom-0 w-[1px] bg-slate-800" />
-                  <div className="absolute top-[50%] left-0 right-0 h-[1px] bg-slate-800" />
+                <div className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-100">
+                  {/* Origin axes lines */}
+                  <div className="absolute left-[35%] top-0 bottom-0 w-[1px] bg-slate-300 dark:bg-slate-800/60" />
+                  <div className="absolute top-[50%] left-0 right-0 h-[1px] bg-slate-300 dark:bg-slate-800/60" />
                   
-                  {/* Origin Indicator */}
-                  <span className="absolute left-[36%] top-[51%] text-[9px] font-mono text-slate-600">(0,0)</span>
+                  {/* Dotted grid lines */}
+                  <div 
+                    className="absolute inset-0 opacity-[0.07] dark:opacity-[0.03]"
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(to right, #000 1px, transparent 1px),
+                        linear-gradient(to bottom, #000 1px, transparent 1px)
+                      `,
+                      backgroundSize: "20px 20px",
+                    }}
+                  />
                   
-                  {/* Small axis ticks */}
+                  {/* Scale indicators */}
                   {Array.from({ length: 9 }).map((_, idx) => (
                     <div 
                       key={`xtick-${idx}`}
-                      className="absolute w-[1px] h-2 bg-slate-800"
+                      className="absolute w-[1px] h-2 bg-slate-300 dark:bg-slate-800"
                       style={{ left: `${10 + idx * 10}%`, top: "calc(50% - 4px)" }}
                     />
                   ))}
                   {Array.from({ length: 9 }).map((_, idx) => (
                     <div 
                       key={`ytick-${idx}`}
-                      className="absolute h-[1px] w-2 bg-slate-800"
+                      className="absolute h-[1px] w-2 bg-slate-300 dark:bg-slate-800"
                       style={{ top: `${10 + idx * 10}%`, left: "calc(35% - 4px)" }}
                     />
                   ))}
@@ -378,7 +385,7 @@ class FourierSquareWave(Scene):
                       cy={circle.cy} 
                       r={circle.r} 
                       fill="none" 
-                      stroke={index === 0 ? "#1e293b" : "rgba(148, 163, 184, 0.15)"} 
+                      stroke={index === 0 ? "rgba(100, 116, 139, 0.4)" : "rgba(148, 163, 184, 0.15)"} 
                       strokeWidth={index === 0 ? "1.5" : "1"} 
                     />
                     {/* Rotating Vector Arrow */}
@@ -436,9 +443,9 @@ class FourierSquareWave(Scene):
               </svg>
             </div>
 
-            <div className="flex items-center justify-between px-6 py-4 border-t border-slate-900 bg-slate-950/40 text-xs font-mono text-slate-500">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-900 bg-slate-50 dark:bg-slate-950/40 text-xs font-mono text-slate-500">
               <span>Formula: Fourier Square Approximation</span>
-              <span className="text-emerald-400">Manim Code Compiled Successfully</span>
+              <span className="text-emerald-500 font-bold">Manim Code Compiled Successfully</span>
             </div>
           </div>
         </div>

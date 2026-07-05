@@ -68,17 +68,17 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-950/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Grid Pattern */}
       <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className="absolute inset-0 opacity-[0.06] dark:opacity-[0.02] pointer-events-none text-slate-900 dark:text-slate-100"
         style={{
           backgroundImage: `
-            linear-gradient(to right, #ffffff 1px, transparent 1px),
-            linear-gradient(to bottom, #ffffff 1px, transparent 1px)
+            linear-gradient(to right, currentColor 1px, transparent 1px),
+            linear-gradient(to bottom, currentColor 1px, transparent 1px)
           `,
           backgroundSize: "30px 30px",
         }}
@@ -89,15 +89,15 @@ export default function SignupPage() {
 
       {/* Card container */}
       <main className="flex-1 flex items-center justify-center p-6 z-10">
-        <div className="w-full max-w-md bg-[#07090e] border border-slate-900 rounded-2xl p-8 relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-500/0 via-sky-500/40 to-sky-500/0" />
+        <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-500/0 via-sky-500/20 to-sky-500/0" />
           
           <div className="space-y-6">
             <div className="space-y-2 text-center">
-              <h2 className="text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">
                 Create an account
               </h2>
-              <p className="text-xs font-mono text-slate-400">
+              <p className="text-xs font-mono text-muted-foreground">
                 Sign up to start generating premium mathematical explainer animations
               </p>
             </div>
@@ -118,7 +118,7 @@ export default function SignupPage() {
             ) : (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
                     Email address
                   </label>
                   <div className="relative">
@@ -129,13 +129,13 @@ export default function SignupPage() {
                       placeholder="name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-[#05070a] border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500/50 transition-colors font-sans"
+                      className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-lg text-sm text-foreground placeholder-slate-400 focus:outline-none focus:border-sky-500/50 transition-colors font-sans"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
                     Password
                   </label>
                   <div className="relative">
@@ -146,12 +146,12 @@ export default function SignupPage() {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 bg-[#05070a] border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500/50 transition-colors font-sans"
+                      className="w-full pl-10 pr-10 py-2.5 bg-background border border-border rounded-lg text-sm text-foreground placeholder-slate-400 focus:outline-none focus:border-sky-500/50 transition-colors font-sans"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-855 dark:hover:text-slate-300"
                     >
                       {showPassword ? (
                         <EyeOff className="w-4 h-4" />
@@ -163,7 +163,7 @@ export default function SignupPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
                     Confirm Password
                   </label>
                   <div className="relative">
@@ -174,7 +174,7 @@ export default function SignupPage() {
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-[#05070a] border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500/50 transition-colors font-sans"
+                      className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-lg text-sm text-foreground placeholder-slate-400 focus:outline-none focus:border-sky-500/50 transition-colors font-sans"
                     />
                   </div>
                 </div>
@@ -191,8 +191,8 @@ export default function SignupPage() {
             )}
 
             <div className="relative my-6 flex items-center justify-center">
-              <span className="absolute w-full h-[1px] bg-slate-900/60" />
-              <span className="relative px-3 bg-[#07090e] text-[10px] font-mono uppercase tracking-wider text-slate-500">
+              <span className="absolute w-full h-[1px] bg-border" />
+              <span className="relative px-3 bg-card text-[10px] font-mono uppercase tracking-wider text-slate-500">
                 Already have an account?
               </span>
             </div>

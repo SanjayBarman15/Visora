@@ -35,6 +35,7 @@ import {
   SidebarRail,
   SidebarTrigger
 } from "@/components/ui/sidebar"
+import { useTheme } from "next-themes"
 import {
   LogOut,
   Plus,
@@ -44,12 +45,22 @@ import {
   ArrowUp,
   Cpu,
   HelpCircle,
-  Home
+  Home,
+  Sun,
+  Moon
 } from "lucide-react"
 import Link from "next/link"
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
   const {
     sidebarCollapsed,
     projects,
@@ -137,9 +148,9 @@ export default function DashboardPage() {
   return (
     <SidebarProvider open={!sidebarCollapsed} onOpenChange={(open) => toggleSidebar()}>
       {/* 1. Left Sidebar */}
-      <Sidebar collapsible="icon" className="border-r border-slate-900 bg-[#07090e] text-slate-100">
+      <Sidebar collapsible="icon" className="border-r border-slate-200 dark:border-slate-900 bg-white dark:bg-[#07090e] text-slate-900 dark:text-slate-100">
         {/* Top Section */}
-        <SidebarHeader className={`h-16 flex flex-row items-center border-b border-slate-900/60 transition-all duration-200 ${
+        <SidebarHeader className={`h-16 flex flex-row items-center border-b border-slate-200 dark:border-slate-900/60 bg-white dark:bg-[#07090e] transition-all duration-200 ${
           sidebarCollapsed ? "justify-center px-0" : "justify-between px-4"
         }`}>
           <Link href="/" className="flex items-center gap-2 hover:opacity-95 transition-opacity">
@@ -151,12 +162,12 @@ export default function DashboardPage() {
               className="object-contain"
             />
             {!sidebarCollapsed && (
-              <span className="font-sans font-bold tracking-tight text-white text-md">Visora</span>
+              <span className="font-sans font-bold tracking-tight text-slate-900 dark:text-white text-md">Visora</span>
             )}
           </Link>
           {!sidebarCollapsed && (
             <Link href="/">
-              <Button variant="ghost" size="icon" className="w-7 h-7 text-slate-500 hover:text-slate-300 cursor-pointer">
+              <Button variant="ghost" size="icon" className="w-7 h-7 text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 cursor-pointer">
                 <Home className="w-4 h-4" />
               </Button>
             </Link>
@@ -251,22 +262,22 @@ export default function DashboardPage() {
         </SidebarContent>
 
         {/* Bottom Section (User/Settings) */}
-        <SidebarFooter className={`border-t border-slate-900/60 bg-[#07090e] transition-all duration-200 ${
+        <SidebarFooter className={`border-t border-slate-200 dark:border-slate-900/60 bg-white dark:bg-[#07090e] transition-all duration-200 ${
           sidebarCollapsed ? "p-2" : "p-3"
         }`}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className={`flex items-center gap-3 w-full hover:bg-slate-900/50 rounded-lg transition-colors cursor-pointer text-left focus:outline-none ${
+              <button className={`flex items-center gap-3 w-full hover:bg-slate-100 dark:hover:bg-slate-900/50 rounded-lg transition-colors cursor-pointer text-left focus:outline-none ${
                 sidebarCollapsed ? "justify-center p-1" : "p-1.5"
               }`}>
-                <Avatar className="w-8 h-8 border border-slate-800 shrink-0">
-                  <AvatarFallback className="bg-sky-950 text-sky-400 font-bold text-xs">
+                <Avatar className="w-8 h-8 border border-slate-200 dark:border-slate-800 shrink-0">
+                  <AvatarFallback className="bg-sky-500/10 dark:bg-sky-950 text-sky-600 dark:text-sky-400 font-bold text-xs">
                     {user?.email?.slice(0, 2).toUpperCase() || "US"}
                   </AvatarFallback>
                 </Avatar>
                 {!sidebarCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-slate-200 truncate">
+                    <p className="text-xs font-medium text-slate-700 dark:text-slate-200 truncate">
                       {user?.email?.split("@")[0]}
                     </p>
                     <p className="text-[10px] text-slate-500 font-mono truncate">
@@ -276,21 +287,21 @@ export default function DashboardPage() {
                 )}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-slate-950 border-slate-900 text-slate-200">
-              <DropdownMenuLabel className="font-mono text-xs text-slate-400">My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-slate-900" />
-              <DropdownMenuItem className="text-xs focus:bg-slate-900 focus:text-white cursor-pointer flex items-center gap-2">
+            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-900 text-slate-800 dark:text-slate-200">
+              <DropdownMenuLabel className="font-mono text-xs text-slate-500 dark:text-slate-400">My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-900" />
+              <DropdownMenuItem className="text-xs focus:bg-slate-100 dark:focus:bg-slate-900 focus:text-slate-900 dark:focus:text-white cursor-pointer flex items-center gap-2">
                 <Settings className="w-3.5 h-3.5" />
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-xs focus:bg-slate-900 focus:text-white cursor-pointer flex items-center gap-2">
+              <DropdownMenuItem className="text-xs focus:bg-slate-100 dark:focus:bg-slate-900 focus:text-slate-900 dark:focus:text-white cursor-pointer flex items-center gap-2">
                 <HelpCircle className="w-3.5 h-3.5" />
                 Documentation
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-slate-900" />
+              <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-900" />
               <DropdownMenuItem
                 onClick={signOut}
-                className="text-xs text-rose-400 focus:bg-rose-950/20 focus:text-rose-300 cursor-pointer flex items-center gap-2"
+                className="text-xs text-rose-500 dark:text-rose-400 focus:bg-rose-50 dark:focus:bg-rose-950/20 focus:text-rose-600 dark:focus:text-rose-300 cursor-pointer flex items-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Log out
@@ -315,14 +326,13 @@ export default function DashboardPage() {
           }}
         />
 
-        {activeProjectId ? (
-          /* ================= CONVERSATION VIEW ================= */
-          <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-            {/* Thread Header */}
-            <header className="h-16 border-b border-slate-900/60 bg-[#05070a]/70 backdrop-blur-md px-6 flex items-center justify-between">
-              <div className="flex items-center gap-3 min-w-0">
-                <MessageSquare className="w-4 h-4 text-sky-400 shrink-0" />
-                <h2 className="text-sm font-bold text-white truncate max-w-lg">
+        {/* Unified Workspace Header */}
+        <header className="h-16 border-b border-slate-200 dark:border-slate-900/60 bg-white/70 dark:bg-[#05070a]/70 backdrop-blur-md px-6 flex items-center justify-between z-20 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            {activeProjectId ? (
+              <>
+                <MessageSquare className="w-4 h-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-lg">
                   {activeProject?.title}
                 </h2>
                 {activeProject && (
@@ -330,13 +340,36 @@ export default function DashboardPage() {
                     {getStatusBadge(activeProject.status)}
                   </div>
                 )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="w-8 h-8 text-slate-500 hover:text-slate-300 cursor-pointer">
-                  <Settings className="w-4 h-4" />
-                </Button>
-              </div>
-            </header>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Visora Workspace
+                </h2>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                className="w-8 h-8 rounded-lg text-slate-650 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white cursor-pointer"
+              >
+                {resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" className="w-8 h-8 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
+        </header>
+
+        {activeProjectId ? (
+          /* ================= CONVERSATION VIEW ================= */
+          <div className="flex-1 flex flex-col overflow-hidden relative z-10">
 
             {/* Chat Messages */}
             <ScrollArea className="flex-1 p-6">
@@ -359,8 +392,8 @@ export default function DashboardPage() {
                       <div
                         className={`rounded-2xl px-4.5 py-3 text-sm max-w-[85%] leading-relaxed ${
                           isUser
-                            ? "bg-slate-900 border border-slate-800 text-slate-100"
-                            : "bg-[#07090e]/50 border border-slate-900/80 text-slate-300"
+                            ? "bg-slate-100 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                            : "bg-card dark:bg-[#07090e]/50 border border-border dark:border-slate-900/80 text-slate-750 dark:text-slate-300"
                         }`}
                       >
                         <div className="font-sans whitespace-pre-wrap">{msg.content}</div>
@@ -401,14 +434,14 @@ export default function DashboardPage() {
             </ScrollArea>
 
             {/* Bottom Fixed Input Bar */}
-            <div className="p-4 border-t border-slate-900/60 bg-[#05070a]/90 backdrop-blur-md">
+            <div className="p-4 border-t border-border bg-background/90 backdrop-blur-md">
               <form onSubmit={handleChatSubmit} className="max-w-3xl mx-auto flex gap-2">
                 <input
                   type="text"
                   placeholder="Ask Scout to modify the video requirements..."
                   value={chatInputText}
                   onChange={(e) => setChatInputText(e.target.value)}
-                  className="flex-1 bg-slate-950 border border-slate-900 rounded-lg px-4 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500/30 transition-colors font-sans"
+                  className="flex-1 bg-background border border-border rounded-lg px-4 py-2.5 text-xs text-foreground placeholder-slate-450 dark:placeholder-slate-600 focus:outline-none focus:border-sky-500/30 transition-colors font-sans"
                 />
                 <Button
                   type="submit"
@@ -427,20 +460,20 @@ export default function DashboardPage() {
               
               {/* Product Header Branding */}
               <div className="text-center space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-sky-500/20 bg-sky-950/20 text-sky-400 text-[10px] font-mono tracking-wider uppercase mb-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-sky-500/20 bg-sky-550/10 dark:bg-sky-950/20 text-sky-600 dark:text-sky-400 text-[10px] font-mono tracking-wider uppercase mb-2">
                   <Sparkles className="w-3.5 h-3.5" />
                   Code-Driven Explainer Engine
                 </div>
-                <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   What are we visualising today?
                 </h1>
-                <p className="text-slate-500 text-xs sm:text-sm max-w-md mx-auto">
+                <p className="text-slate-600 dark:text-slate-500 text-xs sm:text-sm max-w-md mx-auto">
                   Type your prompt to coordinate with Scout and generate mathematically precise Python Manim videos.
                 </p>
               </div>
 
               {/* Large Composer Card */}
-              <div className="bg-[#07090e] border border-slate-900 rounded-xl p-4 shadow-2xl relative overflow-hidden">
+              <div className="bg-card border border-border rounded-xl p-4 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-sky-500/0 via-sky-500/30 to-sky-500/0" />
                 
                 <form onSubmit={handleInitSubmit} className="space-y-3">
@@ -449,11 +482,11 @@ export default function DashboardPage() {
                     placeholder="Describe the video you want to create..."
                     value={initPromptText}
                     onChange={(e) => setInitPromptText(e.target.value)}
-                    className="min-h-[120px] w-full bg-slate-950/50 border-slate-900/80 rounded-lg placeholder-slate-700 text-slate-100 focus:border-sky-500/20 focus:ring-0 resize-none font-sans text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="min-h-[120px] w-full bg-background border border-border rounded-lg placeholder-slate-400 dark:placeholder-slate-700 text-foreground focus:border-sky-500/20 focus:ring-0 resize-none font-sans text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                   
-                  <div className="flex justify-between items-center pt-2 border-t border-slate-900/60">
-                    <span className="text-[10px] font-mono text-slate-600 flex items-center gap-1">
+                  <div className="flex justify-between items-center pt-2 border-t border-border">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-600 flex items-center gap-1">
                       <Cpu className="w-3.5 h-3.5 text-sky-500/50" />
                       Powered by Visora NIM Pipeline
                     </span>
@@ -471,7 +504,7 @@ export default function DashboardPage() {
 
               {/* Suggested Chips list */}
               <div className="space-y-2.5">
-                <div className="text-[10px] font-mono text-slate-600 uppercase tracking-wider text-center">
+                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-600 uppercase tracking-wider text-center">
                   Suggested Prompt Templates
                 </div>
                 <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
@@ -479,7 +512,7 @@ export default function DashboardPage() {
                     <button
                       key={idx}
                       onClick={() => handleChipClick(chip)}
-                      className="px-3.5 py-1.5 bg-[#07090e] border border-slate-900 hover:border-slate-800 text-slate-400 hover:text-slate-200 text-xs rounded-lg transition-colors cursor-pointer font-sans"
+                      className="px-3.5 py-1.5 bg-card border border-border hover:border-slate-350 dark:hover:border-slate-800 text-slate-650 dark:text-slate-400 hover:text-slate-950 dark:hover:text-slate-200 text-xs rounded-lg transition-colors cursor-pointer font-sans"
                     >
                       {chip}
                     </button>

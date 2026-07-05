@@ -16,7 +16,7 @@ export default function Page() {
   const { session } = useAuth()
 
   return (
-    <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300">
       
       <VisoraHeader />
 
@@ -41,25 +41,25 @@ export default function Page() {
         </div>
 
         {/* Audience / Use Cases Callout */}
-        <section className="relative py-24 bg-[#05070a] border-b border-slate-900 overflow-hidden">
+        <section className="relative py-24 bg-background border-b border-border overflow-hidden">
           <div className="container mx-auto px-6 relative z-10 max-w-5xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               
               {/* Text */}
               <div className="lg:col-span-6 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/20 bg-sky-950/20 text-sky-400 text-xs font-mono">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/20 bg-sky-500/10 text-sky-500 dark:text-sky-400 text-xs font-mono">
                   <Compass className="w-3.5 h-3.5" />
                   WHO IS IT FOR?
                 </div>
-                <h2 className="text-3xl font-extrabold text-white leading-tight">
+                <h2 className="text-3xl font-extrabold text-foreground leading-tight">
                   Engineered for Technical Communicators
                 </h2>
-                <p className="text-slate-400 leading-relaxed font-sans text-sm">
+                <p className="text-muted-foreground leading-relaxed font-sans text-sm">
                   Whether you are explaining advanced calculus to high schoolers, publishing scientific 
                   articles on physics, or building educational Youtube channels, Visora empowers you with:
                 </p>
 
-                <ul className="space-y-3 font-sans text-sm text-slate-300">
+                <ul className="space-y-3 font-sans text-sm text-muted-foreground dark:text-slate-300">
                   <li className="flex items-center gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>No Manim coding required, but code output is always ready.</span>
@@ -76,7 +76,7 @@ export default function Page() {
               </div>
 
               {/* Graphical illustration / Visual box */}
-              <div className="lg:col-span-6 bg-[#07090e] border border-slate-900 rounded-2xl p-6 relative overflow-hidden">
+              <div className="lg:col-span-6 bg-card dark:bg-[#07090e] border border-border rounded-2xl p-6 relative overflow-hidden">
                 <div 
                   className="absolute inset-0 opacity-[0.03] pointer-events-none"
                   style={{
@@ -116,14 +116,14 @@ export default function Page() {
         </section>
 
         {/* Final CTA */}
-        <section className="relative py-24 bg-[#05070a] text-center overflow-hidden">
+        <section className="relative py-24 bg-background text-center overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-sky-950/20 rounded-full blur-[100px] pointer-events-none" />
           
           <div className="container mx-auto px-6 relative z-10 max-w-3xl space-y-8">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground">
               Start Generating Precise Explainer Videos Today
             </h2>
-            <p className="text-slate-400 font-sans max-w-xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground font-sans max-w-xl mx-auto leading-relaxed">
               Describe your mathematical concept, adjust the parameters, and let Visora&apos;s multi-agent 
               system generate production-ready Python Manim scripts and voiceovers.
             </p>
