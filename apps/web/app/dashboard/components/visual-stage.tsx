@@ -315,7 +315,7 @@ export function VisualStage() {
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-[#05070a] p-4 overflow-y-auto min-w-0 select-none">
-      <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col space-y-4">
+      <div className="w-full flex-1 flex flex-col space-y-4">
         
         {/* Render Stage Top Header with Rendering State pill */}
         <div className="flex justify-between items-center bg-slate-100/60 dark:bg-[#0d0e12]/60 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-900">

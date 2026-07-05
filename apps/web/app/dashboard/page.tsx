@@ -155,7 +155,7 @@ export default function DashboardPage() {
           <div className="flex-1 flex overflow-hidden relative">
             
             {/* Panel A: Left Chat list (constrained width) */}
-            <div className="w-[300px] border-r border-slate-200 dark:border-slate-900 shrink-0 h-full">
+            <div className="w-[360px] border-r border-slate-200 dark:border-slate-900 shrink-0 h-full">
               <ChatView />
             </div>
 
