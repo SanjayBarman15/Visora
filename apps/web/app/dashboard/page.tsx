@@ -84,17 +84,6 @@ export default function DashboardPage() {
 
             {/* Panel C: Right Code Inspector */}
             <CodeInspector />
-
-            {/* Collapsed side handle to open code panel when collapsed */}
-            {!isCodePanelOpen && activeProject?.status === "done" && (
-              <button
-                onClick={toggleCodePanel}
-                className="absolute right-0 top-1/2 -translate-y-1/2 bg-sky-500 hover:bg-sky-600 text-slate-950 border border-slate-700 py-3.5 px-1.5 rounded-l-xl cursor-pointer flex flex-col items-center gap-2 shadow-2xl z-30 transition-transform"
-              >
-                <Code className="w-3.5 h-3.5" />
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-            )}
             
           </div>
         )}

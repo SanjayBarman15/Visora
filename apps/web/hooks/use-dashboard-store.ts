@@ -36,6 +36,7 @@ interface DashboardState {
   messages: Message[]
   scenePlans: Record<string, Scene[]>
   isCodePanelOpen: boolean
+  codePanelCollapsed: boolean
   
   // Actions
   toggleSidebar: () => void
@@ -356,6 +357,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   messages: initialMessages,
   scenePlans: initialScenePlans,
   isCodePanelOpen: false,
+  codePanelCollapsed: true,
 
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
@@ -520,7 +522,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }))
   },
 
-  toggleCodePanel: () => set((state) => ({ isCodePanelOpen: !state.isCodePanelOpen })),
+  toggleCodePanel: () => set((state) => ({ 
+    isCodePanelOpen: !state.isCodePanelOpen,
+    codePanelCollapsed: !state.codePanelCollapsed,
+  })),
 
   selectScene: (projectId, index) => {
     set((state) => ({
