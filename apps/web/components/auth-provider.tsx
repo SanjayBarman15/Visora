@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import { supabase } from "@/lib/supabase"
 import { Session, User } from "@supabase/supabase-js"
 
@@ -28,6 +29,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
+  
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   useEffect(() => {
     // Check active sessions
@@ -37,36 +46,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     })
 
-    // Listen for changes on auth state
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
-  // Route protection logic
+  // Navigation Guard / Route Protection
   useEffect(() => {
     if (loading) return
 
-    const isAuthRoute = pathname === "/login" || pathname === "/signup"
-    const isProtectedRoute = pathname.startsWith("/dashboard")
+    const publicRoutes = ["/", "/login", "/signup", "/auth/callback"]
+    const isPublicRoute = publicRoutes.includes(pathname)
 
-    if (session && isAuthRoute) {
-      router.push("/dashboard")
-    } else if (!session && isProtectedRoute) {
+    if (!session && !isPublicRoute) {
       router.push("/login")
     }
   }, [session, loading, pathname, router])
 
   const signOut = async () => {
-    setLoading(true)
     await supabase.auth.signOut()
     router.push("/login")
   }
@@ -77,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col items-center justify-center font-sans">
         <div className="relative w-16 h-16 flex items-center justify-center animate-pulse">
           <Image
-            src="/visora_logo_removebg.png"
+            src={mounted && resolvedTheme === "dark" ? "/visora_logo_dark_removebg.png" : "/visora_logo_light_removebg.png"}
             alt="Visora Logo"
             width={64}
             height={64}

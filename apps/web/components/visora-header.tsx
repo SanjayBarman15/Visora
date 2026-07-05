@@ -27,7 +27,7 @@ export function VisoraHeader({ minimal = false }: VisoraHeaderProps) {
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
           <Image
-            src="/visora_logo_removebg.png"
+            src={mounted && resolvedTheme === "dark" ? "/visora_logo_dark_removebg.png" : "/visora_logo_light_removebg.png"}
             alt="Visora Logo"
             width={32}
             height={32}

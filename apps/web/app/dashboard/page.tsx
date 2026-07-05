@@ -155,7 +155,7 @@ export default function DashboardPage() {
         }`}>
           <Link href="/" className="flex items-center gap-2 hover:opacity-95 transition-opacity">
             <Image
-              src="/visora_logo_removebg.png"
+              src={mounted && resolvedTheme === "dark" ? "/visora_logo_dark_removebg.png" : "/visora_logo_light_removebg.png"}
               alt="Visora Logo"
               width={32}
               height={32}
