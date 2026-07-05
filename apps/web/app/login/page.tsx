@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { VisoraHeader } from "@/components/visora-header"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
@@ -67,23 +68,7 @@ export default function LoginPage() {
       />
 
       {/* Top Header/Logo Link */}
-      <header className="w-full border-b border-slate-900/60 bg-[#05070a]/80 backdrop-blur-md z-10">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <Image
-              src="/visora_logo_removebg.png"
-              alt="Visora Logo"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-            <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
-          </Link>
-          <div className="text-xs font-mono text-slate-500">
-            01.Authentication
-          </div>
-        </div>
-      </header>
+      <VisoraHeader minimal />
 
       {/* Card container */}
       <main className="flex-1 flex items-center justify-center p-6 z-10">

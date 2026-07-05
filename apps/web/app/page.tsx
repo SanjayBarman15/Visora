@@ -9,6 +9,8 @@ import { Code2, ArrowRight, Play, Compass, FileCode, CheckCircle2 } from "lucide
 import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
 import Image from "next/image"
+import { VisoraHeader } from "@/components/visora-header"
+import { VisoraFooter } from "@/components/visora-footer"
 
 export default function Page() {
   const { session } = useAuth()
@@ -16,52 +18,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-[#05070a] text-slate-100 flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300">
       
-      {/* Precision Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-900 bg-[#05070a]/80 backdrop-blur-md">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/visora_logo_removebg.png"
-              alt="Visora Logo"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-            <span className="font-sans font-bold tracking-tight text-white text-lg">Visora</span>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-mono text-slate-400">
-            <a href="#pipeline" className="hover:text-white transition-colors">01.Pipeline</a>
-            <a href="#gallery" className="hover:text-white transition-colors">02.Gallery</a>
-            <a href="#compare" className="hover:text-white transition-colors">03.Differentiation</a>
-          </nav>
-
-          {/* CTA Buttons */}
-          <div className="flex items-center gap-3">
-            {session ? (
-              <Link href="/dashboard">
-                <Button className="bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer">
-                  Go to Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" className="hidden sm:inline-flex text-xs font-mono text-slate-400 hover:text-white cursor-pointer">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-sky-500 hover:bg-sky-600 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer">
-                    Start Generating
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <VisoraHeader />
 
       {/* Main Content */}
       <main className="flex-1">
@@ -187,28 +144,7 @@ export default function Page() {
         </section>
       </main>
 
-      {/* Math Themed Footer */}
-      <footer className="border-t border-slate-900 bg-[#05070a] py-12">
-        <div className="container mx-auto px-6 max-w-6xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/visora_logo_removebg.png"
-              alt="Visora Logo"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
-            <span className="font-sans font-bold text-white text-sm">Visora</span>
-            <span className="text-slate-600 font-mono text-[10px] ml-2">v0.1.0</span>
-          </div>
-
-          <div className="flex items-center gap-6 text-xs font-mono text-slate-600">
-            <span>&copy; {new Date().getFullYear()} Visora Inc.</span>
-            <a href="#" className="hover:text-slate-400">Terms</a>
-            <a href="#" className="hover:text-slate-400">Privacy</a>
-          </div>
-        </div>
-      </footer>
+      <VisoraFooter />
 
     </div>
   )
