@@ -51,7 +51,7 @@ export default function SignupPage() {
       gooeyToast.success("Successfully registered!")
       router.push("/dashboard")
     } catch (err: unknown) {
-      const errMsg = (err as Error).message || "An unexpected error occurred."
+      const errMsg = err instanceof Error ? err.message : "An unexpected error occurred."
       setError(errMsg)
       gooeyToast.error(errMsg)
     } finally {

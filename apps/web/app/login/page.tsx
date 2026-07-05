@@ -38,11 +38,11 @@ export default function LoginPage() {
         description: "You have successfully signed in.",
       })
       router.push("/dashboard")
-    } catch (err) {
-      const error = err as { message?: string }
-      setError(error.message || "An unexpected error occurred.")
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred."
+      setError(message)
       gooeyToast.error("Sign in failed", {
-        description: error.message || "Please check your credentials.",
+        description: message,
       })
     } finally {
       setLoading(false)
