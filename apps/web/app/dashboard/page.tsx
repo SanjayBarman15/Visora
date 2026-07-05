@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import Image from "next/image"
+// import Image from "next/image"
 import { useTheme } from "next-themes"
 import { useDashboardStore, useIsChatActive } from "@/hooks/use-dashboard-store"
 import { DashboardSidebar } from "./components/dashboard-sidebar"
@@ -9,16 +9,16 @@ import { DashboardHeader } from "./components/dashboard-header"
 import { ChatView } from "./components/chat/ChatView"
 import { VisualStage } from "./components/visual-stage"
 import { CodeInspector } from "./components/code-inspector"
-import { LayoutGrid, FolderClosed, History, SlidersHorizontal, Cloud, LogOut } from "lucide-react"
+import { Cloud} from "lucide-react"
 import { useAuthStore } from "@/hooks/use-auth-store"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu"
 
 export default function DashboardPage({ isProjectSubroute = false }: { isProjectSubroute?: boolean } = {}) {
   const {
