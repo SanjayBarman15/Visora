@@ -650,7 +650,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
             setTimeout(() => {
               set((state2) => {
                 const project = state2.projects.find((p) => p.id === projectId)
-                if (!project || project.status !== "generating") return {}
+                if (!project || (project.status !== "generating" && project.status !== "assembling")) return {}
                 
                 const pending = project.pendingRevisions || []
                 
