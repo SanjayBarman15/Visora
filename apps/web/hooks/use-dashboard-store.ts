@@ -54,6 +54,8 @@ interface DashboardState {
   approvePlan: (projectId: string) => void
   approveScenePlan: (projectId: string) => void
   toggleNarration: (projectId: string) => void
+  regenerateScene: (projectId: string, sceneId: string) => Promise<void>
+  adjustAudioOnly: (projectId: string, changes: string) => Promise<void>
 }
 
 // Mock Manim Codes
@@ -663,6 +665,37 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         p.id === projectId ? { ...p, narrationEnabled: !p.narrationEnabled } : p
       ),
     }))
+  },
+
+  regenerateScene: async (projectId, sceneId) => {
+    // Set only this scene status to generating
+    set((state) => {
+      const scenes = state.scenePlans[projectId] || []
+      return {
+        scenePlans: {
+          ...state.scenePlans,
+          [projectId]: scenes.map((s) => s.id === sceneId ? { ...s, status: "generating" as const } : s)
+        }
+      }
+    })
+
+    // Simulate completion after 2.5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 2500))
+
+    set((state) => {
+      const scenes = state.scenePlans[projectId] || []
+      return {
+        scenePlans: {
+          ...state.scenePlans,
+          [projectId]: scenes.map((s) => s.id === sceneId ? { ...s, status: "done" as const } : s)
+        }
+      }
+    })
+  },
+
+  adjustAudioOnly: async (projectId, changes) => {
+    // Audio-only adjustment does not touch scene status. Just wait and simulate remixing
+    await new Promise((resolve) => setTimeout(resolve, 2000))
   },
 }))
 

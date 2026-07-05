@@ -10,10 +10,13 @@ import {
   Loader2,
   CheckCircle,
   Volume2,
+  VolumeX,
   Maximize2,
   Code,
   Sparkles,
+  RefreshCw,
 } from "lucide-react"
+import { gooeyToast } from "@/components/ui/goey-toaster"
 
 export function VisualStage() {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
@@ -26,6 +29,8 @@ export function VisualStage() {
     toggleCodePanel,
     selectScene,
     approvePlan,
+    regenerateScene,
+    adjustAudioOnly,
   } = useDashboardStore()
 
   const activeProject = projects.find((p) => p.id === activeProjectId)
@@ -33,6 +38,23 @@ export function VisualStage() {
 
   const scenes = activeProjectId ? scenePlans[activeProjectId] || [] : []
   const activeScene = scenes[activeProject.activeSceneIndex]
+
+  const handleRegenerateEntire = async () => {
+    gooeyToast.success("Rebuilding entire video render process...")
+    approvePlan(activeProjectId!)
+  }
+
+  const handleRegenerateScene = async (sceneId: string) => {
+    gooeyToast.success("Regenerating scene compile steps...")
+    await regenerateScene(activeProjectId!, sceneId)
+    gooeyToast.success("Scene regeneration complete!")
+  }
+
+  const handleAdjustAudioOnly = async () => {
+    gooeyToast.success("Applying audio track remixes...")
+    await adjustAudioOnly(activeProjectId!, "remix")
+    gooeyToast.success("Audio track mix successfully updated!")
+  }
 
   const getSceneStatusComponent = (status: Scene["status"]) => {
     switch (status) {
@@ -130,14 +152,23 @@ export function VisualStage() {
             </span>
           </div>
           <div className="flex gap-2">
-            {activeProject.status === "done" && (
-              <Button
-                variant="outline"
-                onClick={() => approvePlan(activeProjectId!)}
-                className="text-xs border-slate-750 text-slate-350 hover:text-white"
-              >
-                Regenerate Entire Video
-              </Button>
+            {(activeProject.status === "done" || activeProject.status === "done_with_warnings") && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleAdjustAudioOnly}
+                  className="text-xs border-slate-700 hover:bg-slate-800 text-slate-350 hover:text-white cursor-pointer"
+                >
+                  Adjust Audio Only
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleRegenerateEntire}
+                  className="text-xs border-slate-700 hover:bg-slate-800 text-slate-350 hover:text-white cursor-pointer"
+                >
+                  Regenerate Entire Video
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -177,28 +208,36 @@ export function VisualStage() {
               ))}
             </div>
 
-            <div className="border-t border-slate-200 dark:border-slate-900 pt-4 space-y-2">
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                  {activeProject.status === "assembling" ? (
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  ) : (
-                    <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
-                  )}
-                  Narration & TTS Pipeline (ElevenLabs)
-                </span>
-                <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
-                  {activeProject.status === "assembling" ? "completed" : "generating"}
+            {activeProject.narrationEnabled ? (
+              <div className="border-t border-slate-200 dark:border-slate-900 pt-4 space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                    {activeProject.status === "assembling" ? (
+                      <CheckCircle className="w-4 h-4 text-emerald-500" />
+                    ) : (
+                      <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+                    )}
+                    Narration & TTS Pipeline (ElevenLabs)
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
+                    {activeProject.status === "assembling" ? "completed" : "generating"}
+                  </span>
+                </div>
+                <div className="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full transition-all duration-1000 ${
+                      activeProject.status === "assembling" ? "w-full bg-emerald-500" : "w-1/2 bg-indigo-500 animate-pulse"
+                    }`}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="border-t border-slate-200 dark:border-slate-900 pt-4 space-y-1 text-center">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600">
+                  AI Narration disabled for this project
                 </span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
-                <div 
-                  className={`h-full transition-all duration-1000 ${
-                    activeProject.status === "assembling" ? "w-full bg-emerald-500" : "w-1/2 bg-indigo-500 animate-pulse"
-                  }`}
-                />
-              </div>
-            </div>
+            )}
           </div>
         ) : (
           <div className="space-y-6 flex-1 flex flex-col">
@@ -223,8 +262,14 @@ export function VisualStage() {
                     >
                       {isVideoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     </Button>
-                    <Button size="icon" variant="ghost" className="w-8 h-8 text-white hover:bg-slate-900 cursor-pointer">
-                      <Volume2 className="w-4 h-4" />
+                    <Button 
+                      size="icon" 
+                      variant="ghost" 
+                      className={`w-8 h-8 hover:bg-slate-900 cursor-pointer ${activeProject.narrationEnabled ? "text-white" : "text-slate-550"}`}
+                      title={activeProject.narrationEnabled ? "Audio enabled" : "Audio disabled"}
+                      disabled={!activeProject.narrationEnabled}
+                    >
+                      {activeProject.narrationEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                     </Button>
                     <span className="text-[10px] font-mono text-slate-400">
                       {isVideoPlaying ? "0:05" : "0:00"} / 0:19
@@ -268,9 +313,23 @@ export function VisualStage() {
                           : "bg-white dark:bg-card/40 border-slate-200 dark:border-border hover:border-sky-300 dark:hover:border-slate-850 hover:shadow-sm"
                       }`}
                     >
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center w-full">
                         <span className="text-[10px] font-mono text-slate-500">Scene {idx + 1}</span>
-                        <span className="text-[10px] font-mono text-slate-500">{scene.duration}s</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-mono text-slate-500">{scene.duration}s</span>
+                          {(activeProject.status === "done" || activeProject.status === "done_with_warnings") && (
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleRegenerateScene(scene.id)
+                              }}
+                              className="p-0.5 rounded text-slate-400 hover:text-sky-500 hover:bg-slate-100 dark:hover:bg-slate-900 cursor-pointer transition-colors"
+                              title="Regenerate this scene"
+                            >
+                              <RefreshCw className="w-3 h-3" />
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="text-xs font-bold text-slate-900 dark:text-white truncate w-full">
                         {scene.title}
