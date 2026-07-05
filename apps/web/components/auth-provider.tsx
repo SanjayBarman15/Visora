@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
-import { supabase } from "@/lib/supabase"
+import { useAuthStore } from "@/hooks/use-auth-store"
 import { Session, User } from "@supabase/supabase-js"
 
 interface AuthContextType {
@@ -24,9 +24,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, session, loading, init, signOut } = useAuthStore()
   const router = useRouter()
   const pathname = usePathname()
   
@@ -38,23 +36,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => cancelAnimationFrame(frame)
   }, [])
 
+  // Initialize Auth Store
   useEffect(() => {
-    // Check active sessions
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+    init()
+  }, [init])
 
   // Navigation Guard / Route Protection
   useEffect(() => {
@@ -67,11 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       router.push("/login")
     }
   }, [session, loading, pathname, router])
-
-  const signOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/login")
-  }
 
   // Beautiful matching loader
   if (loading) {

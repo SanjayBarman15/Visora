@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { VisoraHeader } from "@/components/visora-header"
-import { supabase } from "@/lib/supabase"
+import { useAuthStore } from "@/hooks/use-auth-store"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from "lucide-react"
@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const loginAction = useAuthStore((state) => state.login)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,12 +32,8 @@ export default function LoginPage() {
 
     try {
       loginSchema.parse({ email, password })
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      await loginAction(email, password)
 
-      if (signInError) throw signInError
       gooeyToast.success("Welcome back!", {
         description: "You have successfully signed in.",
       })
