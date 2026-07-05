@@ -6,11 +6,14 @@ import DashboardPage from "../../page"
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
-  const { setActiveProject } = useDashboardStore()
+  const { setActiveProject, toggleSidebar, sidebarCollapsed } = useDashboardStore()
 
   useEffect(() => {
     if (resolvedParams?.id) {
       setActiveProject(resolvedParams.id)
+      if (!sidebarCollapsed) {
+        toggleSidebar()
+      }
     }
   }, [resolvedParams?.id, setActiveProject])
 

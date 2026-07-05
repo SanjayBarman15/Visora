@@ -9,6 +9,7 @@ import {
   Sun,
   Moon,
   HelpCircle,
+  Menu,
 } from "lucide-react"
 
 export function DashboardHeader() {
@@ -19,12 +20,21 @@ export function DashboardHeader() {
     setMounted(true)
   }, [])
 
-  const { activeProjectId, projects } = useDashboardStore()
+  const { activeProjectId, projects, toggleSidebar } = useDashboardStore()
   const activeProject = projects.find((p) => p.id === activeProjectId)
 
   return (
     <header className="h-14 border-b border-slate-200 dark:border-slate-900/60 bg-white dark:bg-[#090b10] text-slate-800 dark:text-slate-200 px-6 flex items-center justify-between z-20 shrink-0 select-none">
       <div className="flex items-center gap-3 text-sm font-sans font-medium">
+        <Button
+          onClick={() => toggleSidebar()}
+          variant="ghost"
+          size="icon"
+          className="w-8 h-8 rounded-lg mr-1 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 cursor-pointer"
+          title="Toggle Sidebar"
+        >
+          <Menu className="w-4.5 h-4.5" />
+        </Button>
         <span className="font-bold text-slate-900 dark:text-white tracking-wide">Visora Workspace</span>
         {activeProject && (
           <>
