@@ -47,7 +47,8 @@ export function DashboardSidebar() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const frame = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(frame)
   }, [])
 
   const {
@@ -111,6 +112,7 @@ export function DashboardSidebar() {
             width={32}
             height={32}
             className="object-contain"
+            priority
           />
           {!sidebarCollapsed && (
             <span className="font-sans font-bold tracking-tight text-slate-900 dark:text-white text-md">Visora</span>
@@ -255,7 +257,7 @@ export function DashboardSidebar() {
               <LogOut className="w-3.5 h-3.5" />
               Log out
             </DropdownMenuItem>
-          </DropdownMenu>
+          </DropdownMenuContent>
         </DropdownMenu>
       </SidebarFooter>
       <SidebarRail />

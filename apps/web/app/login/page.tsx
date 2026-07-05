@@ -38,7 +38,6 @@ export default function LoginPage() {
         description: "You have successfully signed in.",
       })
       router.push("/dashboard")
-      router.refresh()
     } catch (err) {
       const error = err as { message?: string }
       setError(error.message || "An unexpected error occurred.")

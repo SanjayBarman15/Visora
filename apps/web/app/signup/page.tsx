@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
+// import Image from "next/image"
 import { VisoraHeader } from "@/components/visora-header"
 import { useAuthStore } from "@/hooks/use-auth-store"
 import { Button } from "@/components/ui/button"
@@ -50,8 +50,8 @@ export default function SignupPage() {
       setSuccess(true)
       gooeyToast.success("Successfully registered!")
       router.push("/dashboard")
-    } catch (err: any) {
-      const errMsg = err.message || "An unexpected error occurred."
+    } catch (err: unknown) {
+      const errMsg = (err as Error).message || "An unexpected error occurred."
       setError(errMsg)
       gooeyToast.error(errMsg)
     } finally {
