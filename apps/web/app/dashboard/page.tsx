@@ -30,10 +30,20 @@ export default function DashboardPage() {
       <DashboardSidebar />
 
       {/* Main Workspace Frame */}
-      <main className="flex-1 flex flex-col overflow-hidden relative bg-[#f8fafc] dark:bg-[#030508]">
+      <main className="flex-1 flex flex-col overflow-hidden relative bg-slate-50 dark:bg-[#030508]">
         {/* Decorative Grid Overlay */}
         <div 
-          className="absolute inset-0 opacity-[0.015] pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgb(148 163 184 / 0.18) 1px, transparent 1px),
+              linear-gradient(to bottom, rgb(148 163 184 / 0.18) 1px, transparent 1px)
+            `,
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div 
+          className="absolute inset-0 dark:block hidden pointer-events-none opacity-[0.025]"
           style={{
             backgroundImage: `
               linear-gradient(to right, #ffffff 1px, transparent 1px),

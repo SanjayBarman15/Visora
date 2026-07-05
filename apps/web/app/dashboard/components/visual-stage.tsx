@@ -116,7 +116,7 @@ export function VisualStage() {
   const isProgressState = activeProject.status === "generating" || activeProject.status === "assembling"
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50/20 dark:bg-[#05070a]/20 p-6 overflow-y-auto min-w-0">
+    <div className="flex-1 flex flex-col bg-slate-50 dark:bg-[#05070a]/20 p-6 overflow-y-auto min-w-0">
       <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -141,26 +141,26 @@ export function VisualStage() {
         </div>
 
         {isProgressState ? (
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-2xl space-y-6">
+          <div className="bg-white dark:bg-card border border-slate-200/80 dark:border-border rounded-2xl p-6 shadow-md dark:shadow-2xl space-y-6">
             <div className="flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-sky-500 animate-spin" />
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">Parallel Scene Pipeline</h3>
-              <Badge className="ml-auto font-mono text-[9px] bg-slate-800 text-slate-400">
+              <Badge className="ml-auto font-mono text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-transparent">
                 {activeProject.status}
               </Badge>
             </div>
 
             <div className="space-y-4">
               {activeProject.scenes?.map((scene, idx) => (
-                <div key={scene.id} className="space-y-1 bg-slate-950/20 border border-slate-900/60 rounded-xl p-3">
+                <div key={scene.id} className="space-y-1 bg-slate-50 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900/60 rounded-xl p-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-350 flex items-center gap-2">
+                    <span className="font-bold text-slate-700 dark:text-slate-350 flex items-center gap-2">
                       {getSceneStatusComponent(scene.status)}
                       Scene {idx + 1}: {scene.title}
                     </span>
-                    <span className="font-mono text-[10px] text-slate-500 capitalize">{scene.status}</span>
+                    <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 capitalize">{scene.status}</span>
                   </div>
-                  <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
                     <div 
                       className={`h-full transition-all duration-1000 ${
                         scene.status === "done" ? "w-full bg-emerald-500" :
@@ -175,21 +175,21 @@ export function VisualStage() {
               ))}
             </div>
 
-            <div className="border-t border-slate-900 pt-4 space-y-2">
+            <div className="border-t border-slate-200 dark:border-slate-900 pt-4 space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-400 flex items-center gap-2">
+                <span className="font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
                   {activeProject.status === "assembling" ? (
-                    <CheckCircle className="w-4 h-4 text-emerald-400" />
+                    <CheckCircle className="w-4 h-4 text-emerald-500" />
                   ) : (
-                    <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />
+                    <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
                   )}
                   Narration & TTS Pipeline (ElevenLabs)
                 </span>
-                <span className="font-mono text-[10px] text-slate-500">
+                <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
                   {activeProject.status === "assembling" ? "completed" : "generating"}
                 </span>
               </div>
-              <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
                 <div 
                   className={`h-full transition-all duration-1000 ${
                     activeProject.status === "assembling" ? "w-full bg-emerald-500" : "w-1/2 bg-indigo-500 animate-pulse"
@@ -262,8 +262,8 @@ export function VisualStage() {
                       onClick={() => selectScene(activeProjectId!, idx)}
                       className={`p-3 text-left border rounded-xl transition-all cursor-pointer flex flex-col gap-1.5 ${
                         isSelected 
-                          ? "bg-white dark:bg-card border-sky-500/50 shadow-md ring-1 ring-sky-500/20" 
-                          : "bg-white/40 dark:bg-card/40 border-border hover:border-slate-350 dark:hover:border-slate-850"
+                          ? "bg-white dark:bg-card border-sky-400 dark:border-sky-500/50 shadow-md ring-1 ring-sky-400/20 dark:ring-sky-500/20" 
+                          : "bg-white dark:bg-card/40 border-slate-200 dark:border-border hover:border-sky-300 dark:hover:border-slate-850 hover:shadow-sm"
                       }`}
                     >
                       <div className="flex justify-between items-center">
