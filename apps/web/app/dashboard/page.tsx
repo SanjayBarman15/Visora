@@ -5,9 +5,8 @@ import { useDashboardStore, useIsChatActive } from "@/hooks/use-dashboard-store"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { DashboardSidebar } from "./components/dashboard-sidebar"
 import { DashboardHeader } from "./components/dashboard-header"
-import { EmptyState } from "./components/empty-state"
 import { PlanReview } from "./components/plan-review"
-import { ChatPanel } from "./components/chat-panel"
+import { ChatView } from "./components/chat/ChatView"
 import { VisualStage } from "./components/visual-stage"
 import { CodeInspector } from "./components/code-inspector"
 import { Code, ChevronLeft } from "lucide-react"
@@ -63,12 +62,12 @@ export default function DashboardPage() {
 
         {!activeProjectId ? (
           /* State A: Workspace is empty */
-          <EmptyState />
+          <ChatView />
         ) : (activeProject?.status === "draft" || activeProject?.status === "eliciting" || activeProject?.status === "plan_review") ? (
           /* State B: Unified conversation chat view (full width scrollable) */
           <div className="flex-1 flex overflow-hidden relative justify-center bg-white dark:bg-[#07090e]/20">
             <div className="w-full max-w-2xl border-x border-slate-200/80 dark:border-slate-900/60 h-full">
-              <ChatPanel />
+              <ChatView />
             </div>
           </div>
         ) : (
@@ -77,7 +76,7 @@ export default function DashboardPage() {
             
             {/* Panel A: Left Chat list (constrained width) */}
             <div className="w-[300px] border-r border-slate-200/80 dark:border-slate-900 shrink-0 h-full">
-              <ChatPanel />
+              <ChatView />
             </div>
 
             {/* Panel B: Center visual frame */}
