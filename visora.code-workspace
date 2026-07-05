@@ -1,0 +1,55 @@
+{
+  "folders": [
+    { "name": "root", "path": "." },
+    { "name": "web", "path": "apps/web" },
+    { "name": "api", "path": "apps/api" },
+    { "name": "agents", "path": "packages/agents" },
+    { "name": "rag", "path": "packages/rag" },
+    { "name": "workers", "path": "packages/workers" },
+    { "name": "schemas", "path": "packages/schemas" },
+    { "name": "tools", "path": "packages/tools" },
+    { "name": "mcp", "path": "packages/mcp" },
+    { "name": "db", "path": "packages/db" },
+    {"name": "docs", "path": "docs"},
+    {"name": "evals", "path": "evals"},
+    {"name": "infra", "path": "infra"},
+    {"name": "script", "path": "scripts"},
+    {"name": "project_info", "path": "projectinfo"}
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder:root}/.venv/bin/python",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "python.analysis.extraPaths": [
+      "packages/schemas/src",
+      "packages/agents/src",
+      "packages/rag/src",
+      "packages/workers/src",
+      "packages/db/src",
+      "packages/tools/src",
+      "packages/mcp/src"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "charliermarsh.ruff",
+      "ms-python.python",
+      "ms-python.mypy-type-checker",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "bradlc.vscode-tailwindcss",
+      "prisma.prisma",
+      "humao.rest-client",
+      "ms-vscode.makefile-tools"
+    ]
+  }
+}

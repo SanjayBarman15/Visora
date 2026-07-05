@@ -1,5 +1,5 @@
 {
-  "name": "mova",
+  "name": "visora",
   "private": true,
   "packageManager": "bun@1.2.19",
   "workspaces": [
@@ -15,7 +15,7 @@
     "turbo": "latest"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-query": "^5.101.2",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   }
