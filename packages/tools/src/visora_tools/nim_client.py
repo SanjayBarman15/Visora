@@ -33,7 +33,7 @@ async def call_nim_model(
     
     url = f"{base_url}/chat/completions"
     
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         try:
             response = await client.post(url, headers=headers, json=payload)
             if response.status_code != 200:
