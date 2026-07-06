@@ -61,7 +61,7 @@ async def startup_validation():
     version = os.getenv("VERSION", "0.1.0")
 
     logger.info("===================================")
-    logger.info("🚀 Visora API Backend Starting")
+    logger.info("🚀 Visora API Backend Running")
     logger.info(f"Environment : {os.getenv('APP_ENV', 'development')}")
     logger.info(f"Version     : {version}")
     logger.info(f"API Prefix  : {API_PREFIX}")

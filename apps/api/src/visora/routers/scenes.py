@@ -5,8 +5,9 @@ from typing import List
 from uuid import UUID
 from visora_db import get_supabase_admin_client
 from visora_schemas import SceneOut
-from visora.dependencies import get_current_user
 from visora_tools import call_nim_model
+from visora_workers import render_scene_task
+from visora.dependencies import get_current_user
 
 logger = logging.getLogger("uvicorn")
 
@@ -132,6 +133,10 @@ async def generate_scene_code(scene_id: UUID, current_user: dict = Depends(get_c
             
         # Update scene status to generating
         supabase.table("scenes").update({"status": "generating"}).eq("id", str(scene_id)).execute()
+        
+        # Trigger Celery task
+        checkpoint_id = res.data[0]["id"]
+        render_scene_task.delay(str(checkpoint_id))
         
         return res.data[0]
     except Exception as e:
