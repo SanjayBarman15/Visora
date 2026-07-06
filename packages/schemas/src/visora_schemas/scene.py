@@ -21,6 +21,8 @@ class SceneOut(SceneBase):
     complexity_score: float
     status: str
     is_dirty: bool
+    clip_url: Optional[str] = None
+    code: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

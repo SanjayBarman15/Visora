@@ -19,6 +19,7 @@ export interface Scene {
   durationSeconds: number
   status: "retrieving" | "generating" | "rendering" | "done" | "error"
   code: string
+  clip_url?: string
 }
 
 export interface Project {
@@ -463,52 +464,41 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       },
     }))
 
-    // Simulate assistant reply after 1.5 seconds, then transition to plan_review
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: `m_ast_${Date.now()}`,
-        projectId: data.id,
-        role: "assistant",
-        content: `I've constructed a proposed scene outline for your topic: "${promptText}". You can see it below. I've designed three main visual stages: an introduction to establish the concepts, a main visual deep-dive showing the core mechanics, and a final summary. Please review and click Approve to generate!`,
-        timestamp: new Date().toISOString(),
-      }
+    // Real planning flow
+    setTimeout(async () => {
+      try {
+        await api.POST("/api/v1/projects/{project_id}/plan", {
+          params: { path: { project_id: data.id } }
+        })
 
-      set((state) => {
-        const updatedProjects = state.projects.map((p) =>
-          p.id === data.id ? { ...p, status: "plan_review" as const } : p
-        )
-        const outlineScenes: Scene[] = [
-          {
-            id: `s_${data.id}_1`,
-            order: 1,
-            title: "Introduction & Setup",
-            description: `Define and setup the basic visual grid for: ${promptText}.`,
-            duration: 5,
-            durationSeconds: 5,
-            status: "done" as const,
-            code: `# Code block for setup`,
-          },
-          {
-            id: `s_${data.id}_2`,
-            order: 2,
-            title: "Core Mechanics Demonstration",
-            description: "Dynamic visual transformation illustrating the core formula/logic.",
-            duration: 10,
-            durationSeconds: 10,
-            status: "done" as const,
-            code: `# Code block for core visuals`,
-          },
-          {
-            id: `s_${data.id}_3`,
-            order: 3,
-            title: "Mathematical Summary",
-            description: "Write out final equations and summarize with highlighting overlays.",
-            duration: 6,
-            durationSeconds: 6,
-            status: "done" as const,
-            code: `# Code block for math overlay`,
-          }
-        ]
+        const scenesRes = await api.GET("/api/v1/projects/{project_id}/scenes", {
+          params: { path: { project_id: data.id } }
+        })
+
+        const realScenes: Scene[] = []
+        if (scenesRes.data) {
+          scenesRes.data.forEach((s) => {
+            realScenes.push({
+              id: s.id,
+              order: s.scene_index,
+              title: s.title,
+              description: s.visual_description || "",
+              duration: s.approximate_duration_seconds || 5,
+              durationSeconds: s.approximate_duration_seconds || 5,
+              status: s.status as any,
+              code: s.code || "",
+              clip_url: s.clip_url || undefined,
+            })
+          })
+        }
+
+        const assistantMessage: Message = {
+          id: `m_ast_${Date.now()}`,
+          projectId: data.id,
+          role: "assistant",
+          content: `I've constructed a proposed scene outline for your topic: "${promptText}". You can see it below. Please review it and click Approve to generate!`,
+          timestamp: new Date().toISOString(),
+        }
 
         const scenePlanMsg: Message = {
           id: `m_sp_${Date.now()}`,
@@ -518,15 +508,22 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           timestamp: new Date().toISOString(),
         }
 
-        return {
-          projects: updatedProjects,
-          messages: [...state.messages, assistantMessage, scenePlanMsg],
-          scenePlans: {
-            ...state.scenePlans,
-            [data.id]: outlineScenes,
-          },
-        }
-      })
+        set((state) => {
+          const updatedProjects = state.projects.map((p) =>
+            p.id === data.id ? { ...p, status: "plan_review" as const } : p
+          )
+          return {
+            projects: updatedProjects,
+            messages: [...state.messages, assistantMessage, scenePlanMsg],
+            scenePlans: {
+              ...state.scenePlans,
+              [data.id]: realScenes,
+            },
+          }
+        })
+      } catch (err) {
+        console.error("Failed to generate real plan:", err)
+      }
     }, 1500)
 
     return data.id
@@ -656,7 +653,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     get().approveScenePlan(projectId)
   },
 
-  approveScenePlan: (projectId) => {
+  approveScenePlan: async (projectId) => {
     // Set status to generating
     set((state) => ({
       projects: state.projects.map((p) =>
@@ -664,102 +661,84 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       ),
     }))
 
-    // Simulate parallel scene generation stages
-    const steps: Array<Array<"retrieving" | "generating" | "rendering" | "done">> = [
-      ["retrieving", "retrieving", "retrieving"],
-      ["generating", "retrieving", "retrieving"],
-      ["rendering", "generating", "retrieving"],
-      ["done", "rendering", "generating"],
-      ["done", "done", "rendering"],
-      ["done", "done", "done"],
-    ]
+    const scenes = get().scenePlans[projectId] || []
+    
+    // Call generate route for each scene
+    for (const scene of scenes) {
+      try {
+        await api.POST("/api/v1/scenes/{scene_id}/generate", {
+          params: { path: { scene_id: scene.id } }
+        })
+      } catch (err) {
+        console.error(`Failed to generate code for scene ${scene.id}:`, err)
+      }
+    }
 
-    steps.forEach((stepStatuses, index) => {
-      setTimeout(() => {
+    // Start polling status
+    const intervalId = setInterval(async () => {
+      try {
+        const scenesRes = await api.GET("/api/v1/projects/{project_id}/scenes", {
+          params: { path: { project_id: projectId } }
+        })
+
+        if (!scenesRes.data) return
+
+        const updatedScenes: Scene[] = scenesRes.data.map((s) => ({
+          id: s.id,
+          order: s.scene_index,
+          title: s.title,
+          description: s.visual_description || "",
+          duration: s.approximate_duration_seconds || 5,
+          durationSeconds: s.approximate_duration_seconds || 5,
+          status: s.status as any,
+          code: s.code || "",
+          clip_url: s.clip_url || undefined,
+        }))
+
+        // Check if all scenes are done or have errored
+        const isAllDone = updatedScenes.every((s) => s.status === "done" || s.status === "error")
+
         set((state) => {
-          // If project was cancelled mid-generation, stop the steps!
-          const activeProj = state.projects.find((p) => p.id === projectId)
-          if (!activeProj || activeProj.status !== "generating") return {}
+          const project = state.projects.find((p) => p.id === projectId)
+          if (!project || project.status !== "generating") {
+            clearInterval(intervalId)
+            return {}
+          }
 
-          const scenes = state.scenePlans[projectId] || []
-          const updatedScenes = scenes.map((s, idx) => {
-            const nextStatus = stepStatuses[idx] || "done"
-            return {
-              ...s,
-              status: nextStatus,
-              code: idx === 0 ? mockIntroAreaCode : idx === 1 ? mockLimitAreaCode : mockIntegralCode
-            }
-          })
-          
-          // Check if final step (all done) -> transition project status to assembling then done
-          const isAllDone = stepStatuses.every((s) => s === "done")
-          
           if (isAllDone) {
-            // Quickly assemble and transition to done
+            clearInterval(intervalId)
+            
+            // Set status to assembling for 1.5 seconds, then done
             setTimeout(() => {
-              set((state2) => {
-                const project = state2.projects.find((p) => p.id === projectId)
-                if (!project || (project.status !== "generating" && project.status !== "assembling")) return {}
-                
-                const pending = project.pendingRevisions || []
-                
-                // If there are pending revisions, apply them automatically!
-                if (pending.length > 0) {
-                  // Add user messages
-                  const newMessages = pending.map((revText, rIdx) => ({
-                    id: `m_rev_${Date.now()}_${rIdx}`,
-                    projectId,
-                    role: "user" as const,
-                    content: revText,
-                    timestamp: new Date().toISOString(),
-                  }))
-                  
-                  // Add assistant response that acknowledges it and asks to review updated plan
-                  const assistantMsg = {
-                    id: `m_ast_rev_${Date.now()}`,
-                    projectId,
-                    role: "assistant" as const,
-                    content: `I've finished the previous generation. Now, I'm applying your pending feedback: "${pending.join(", ")}". Let me know if the updated scene plan looks good!`,
-                    timestamp: new Date().toISOString(),
-                  }
-                  
-                  const scenePlanMsg = {
-                    id: `m_sp_rev_${Date.now()}`,
-                    projectId,
-                    role: "scene_plan" as const,
-                    content: "",
-                    timestamp: new Date().toISOString(),
-                  }
-                  
-                  return {
-                    projects: state2.projects.map((p2) =>
-                      p2.id === projectId ? { ...p2, status: "plan_review" as const, pendingRevisions: [] } : p2
-                    ),
-                    messages: [...state2.messages, ...newMessages, assistantMsg, scenePlanMsg]
-                  }
-                }
-                
-                return {
-                  projects: state2.projects.map((p2) =>
-                    p2.id === projectId ? { ...p2, status: "done" as const } : p2
-                  ),
-                }
-              })
+              set((state2) => ({
+                projects: state2.projects.map((p2) =>
+                  p2.id === projectId ? { ...p2, status: "done" as const } : p2
+                )
+              }))
             }, 1500)
+
+            return {
+              scenePlans: {
+                ...state.scenePlans,
+                [projectId]: updatedScenes,
+              },
+              projects: state.projects.map((p) =>
+                p.id === projectId ? { ...p, status: "assembling" as const } : p
+              ),
+            }
           }
 
           return {
             scenePlans: {
               ...state.scenePlans,
               [projectId]: updatedScenes,
-            },
-            projects: state.projects.map((p) =>
-              p.id === projectId ? { ...p, status: isAllDone ? "assembling" as const : "generating" as const } : p
-            ),
+            }
           }
         })
-      }, (index + 1) * 2000)
-    })
+      } catch (err) {
+        console.error("Error polling scenes status:", err)
+      }
+    }, 2000)
   },
 
   toggleNarration: (projectId) => {

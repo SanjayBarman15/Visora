@@ -350,6 +350,10 @@ export interface components {
             status: string;
             /** Is Dirty */
             is_dirty: boolean;
+            /** Clip Url */
+            clip_url?: string | null;
+            /** Code */
+            code?: string | null;
             /**
              * Created At
              * Format: date-time

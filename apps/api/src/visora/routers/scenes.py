@@ -30,9 +30,16 @@ async def list_scenes(project_id: UUID, current_user: dict = Depends(get_current
         scenes_res = supabase.table("scenes").select("*").eq("project_id", str(project_id)).order("scene_index").execute()
         
         # Prepare scenes response
-        # To avoid schema typing issues with pgvector or special array formats, mapping DB representation to schema:
         results = []
         for row in scenes_res.data:
+            # Fetch latest checkpoint details
+            checkpoint_res = supabase.table("scene_checkpoints").select("clip_url, generated_code, final_code").eq("scene_id", row["id"]).order("created_at", desc=True).limit(1).execute()
+            if checkpoint_res.data:
+                row["clip_url"] = checkpoint_res.data[0].get("clip_url")
+                row["code"] = checkpoint_res.data[0].get("final_code") or checkpoint_res.data[0].get("generated_code") or ""
+            else:
+                row["clip_url"] = None
+                row["code"] = ""
             results.append(row)
         return results
         

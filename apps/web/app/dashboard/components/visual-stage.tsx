@@ -75,8 +75,33 @@ export function VisualStage() {
     }
   }
 
+  const videoRef = React.useRef<HTMLVideoElement>(null)
+
+  React.useEffect(() => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.play().catch(() => {})
+      } else {
+        videoRef.current.pause()
+      }
+    }
+  }, [isVideoPlaying])
+
   const renderActiveSceneVisual = () => {
     if (!activeScene) return null
+
+    if (activeScene.clip_url) {
+      return (
+        <video
+          ref={videoRef}
+          src={activeScene.clip_url}
+          className="w-full h-full object-contain"
+          loop
+          muted
+          playsInline
+        />
+      )
+    }
     
     const titleLower = activeScene.title.toLowerCase()
     const descLower = activeScene.description.toLowerCase()
