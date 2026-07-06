@@ -8,6 +8,10 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from visora.routers.projects import router as projects_router
+from visora.routers.messages import router as messages_router
+from visora.routers.scenes import router as scenes_router
+
 # ---------------------------
 # ENV
 # ---------------------------
@@ -104,6 +108,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------
+# ROUTERS
+# ---------------------------
+app.include_router(projects_router, prefix=API_PREFIX)
+app.include_router(messages_router, prefix=API_PREFIX)
+app.include_router(scenes_router, prefix=API_PREFIX)
 
 
 # ---------------------------

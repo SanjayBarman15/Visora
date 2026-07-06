@@ -5,10 +5,10 @@ import { VisoraHero } from "@/components/visora-hero"
 import { VisoraPipeline } from "@/components/visora-pipeline"
 import { VisoraComparison } from "@/components/visora-comparison"
 import { VisoraExamples } from "@/components/visora-examples"
-import { Code2, ArrowRight, Play, Compass, FileCode, CheckCircle2 } from "lucide-react"
+import {  ArrowRight, Compass, FileCode, CheckCircle2 } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
-import Image from "next/image"
+// import Image from "next/image"
 import { VisoraHeader } from "@/components/visora-header"
 import { VisoraFooter } from "@/components/visora-footer"
 
@@ -17,7 +17,6 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300">
-      
       <VisoraHeader />
 
       {/* Main Content */}

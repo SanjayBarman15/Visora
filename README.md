@@ -1,12 +1,12 @@
-# Mova
+# visora
 
-Mova is an AI-powered animation platform that turns a topic or concept into a complete educational video — Manim animations, voiceover narration, and background music — entirely automatically.
+visora is an AI-powered animation platform that turns a topic or concept into a complete educational video — Manim animations, voiceover narration, and background music — entirely automatically.
 
 ---
 
 ## What it does
 
-You describe what you want to explain. Mova's AI pipeline decomposes it into scenes, generates Manim animation code for each scene, writes a narration script, converts it to speech, mixes audio, and delivers a finished video.
+You describe what you want to explain. visora's AI pipeline decomposes it into scenes, generates Manim animation code for each scene, writes a narration script, converts it to speech, mixes audio, and delivers a   finished video.
 
 ---
 
@@ -46,18 +46,18 @@ You describe what you want to explain. Mova's AI pipeline decomposes it into sce
 ## Project Structure
 
 ```
-mova/
+visora/
 ├── apps/
 │   ├── web/               # Next.js frontend
 │   └── api/               # FastAPI backend
 ├── packages/
-│   ├── mova-schemas/      # Shared Pydantic + Zod types
-│   ├── mova-agents/       # LangGraph agent pipeline
-│   ├── mova-rag/          # Hybrid retrieval system
-│   ├── mova-workers/      # Celery task workers
-│   ├── mova-db/           # Supabase database clients
-│   ├── mova-tools/        # External tool integrations
-│   └── mova-mcp/          # MCP server layer
+│   ├── visora-schemas/      # Shared Pydantic + Zod types
+│   ├── visora-agents/       # LangGraph agent pipeline
+│   ├── visora-rag/          # Hybrid retrieval system
+│   ├── visora-workers/      # Celery task workers
+│   ├── visora-db/           # Supabase database clients
+│   ├── visora-tools/        # External tool integrations
+│   └── visora-mcp/          # MCP server layer
 ├── infra/                 # render.yaml, deployment config
 ├── docs/                  # Project documentation
 ├── evals/                 # Offline evaluation suite
@@ -86,8 +86,8 @@ mova/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/yourname/mova.git
-cd mova
+git clone https://github.com/yourname/visora.git
+cd visora
 ```
 
 ### 2. Set up environment variables
@@ -132,7 +132,7 @@ cd apps/web && bun dev          # Next.js on http://localhost:3000
 cd apps/api && uv run uvicorn main:app --reload  # FastAPI on http://localhost:8000
 
 # Start Celery worker (all queues, for local dev)
-cd apps/api && uv run celery -A mova_workers worker -Q fast,render,audio,merge,voiceover --concurrency=4
+cd apps/api && uv run celery -A visora_workers worker -Q fast,render,audio,merge,voiceover --concurrency=4
 ```
 
 ---

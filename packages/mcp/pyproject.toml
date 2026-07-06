@@ -1,16 +1,16 @@
 [project]
-name = "mova-mcp"
+name = "visora-mcp"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-  "mova-schemas",
-  "mova-rag",
+  "visora-schemas",
+  "visora-rag",
   "mcp>=1.0"
 ]
 
 [tool.uv.sources]
-mova-schemas = { workspace = true }
-mova-rag = { workspace = true }
+visora-schemas = { workspace = true }
+visora-rag = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
