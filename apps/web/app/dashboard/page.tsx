@@ -26,6 +26,7 @@ export default function DashboardPage({ isProjectSubroute = false }: { isProject
     projects,
     toggleSidebar,
     setActiveProject,
+    fetchProjects,
   } = useDashboardStore()
 
   const { user, signOut } = useAuthStore()
@@ -35,7 +36,8 @@ export default function DashboardPage({ isProjectSubroute = false }: { isProject
 
   useEffect(() => {
     setMounted(true)
-  }, [])
+    fetchProjects()
+  }, [fetchProjects])
 
   useEffect(() => {
     if (!isProjectSubroute) {

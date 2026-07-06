@@ -1,4 +1,6 @@
 import { create } from "zustand"
+import { api } from "../lib/api"
+
 
 export interface Message {
   id: string
@@ -38,12 +40,14 @@ interface DashboardState {
   scenePlans: Record<string, Scene[]>
   isCodePanelOpen: boolean
   codePanelCollapsed: boolean
+  isLoadingProjects: boolean
   
   // Actions
+  fetchProjects: () => Promise<void>
   toggleSidebar: () => void
   selectProject: (id: string | null) => void
   setActiveProject: (id: string | null) => void
-  startNewProject: (promptText: string) => string
+  startNewProject: (promptText: string) => Promise<string>
   sendMessage: (content: string) => void
   addMessage: (projectId: string, message: { id: string; role: Message["role"]; content: string; timestamp: string }) => void
   updateProjectStatus: (id: string, status: Project["status"]) => void
@@ -366,28 +370,71 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   scenePlans: initialScenePlans,
   isCodePanelOpen: false,
   codePanelCollapsed: true,
+  isLoadingProjects: false,
+
+  fetchProjects: async () => {
+    set({ isLoadingProjects: true })
+    const { data, error } = await api.GET("/api/v1/projects")
+    if (error) {
+      console.error("Failed to fetch projects:", error)
+      set({ isLoadingProjects: false })
+      return
+    }
+    if (data) {
+      const projectsMapped: Project[] = data.map((p) => ({
+        id: p.id,
+        title: p.title,
+        createdAt: p.created_at || new Date().toISOString(),
+        lastMessageAt: p.updated_at || new Date().toISOString(),
+        status: (p.status || "draft") as Project["status"],
+        activeSceneIndex: 0,
+        narrationEnabled: p.has_voiceover || false,
+        pendingRevisions: [],
+      }))
+      set({ projects: projectsMapped, isLoadingProjects: false })
+    }
+  },
 
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
   selectProject: (id) => set({ activeProjectId: id }),
   setActiveProject: (id) => set({ activeProjectId: id }),
 
-  startNewProject: (promptText) => {
-    const newId = `proj_${Date.now()}`
+  startNewProject: async (promptText) => {
+    const { data, error } = await api.POST("/api/v1/projects", {
+      body: {
+        title: promptText.length > 40 ? promptText.slice(0, 37) + "..." : promptText,
+        has_voiceover: true,
+        has_background_music: false,
+      }
+    })
+    if (error || !data) {
+      console.error("Failed to create project:", error)
+      throw new Error("Failed to create project")
+    }
+
     const newProject: Project = {
-      id: newId,
-      title: promptText.length > 40 ? promptText.slice(0, 37) + "..." : promptText,
-      createdAt: new Date().toISOString(),
-      lastMessageAt: new Date().toISOString(),
+      id: data.id,
+      title: data.title,
+      createdAt: data.created_at || new Date().toISOString(),
+      lastMessageAt: data.updated_at || new Date().toISOString(),
       status: "eliciting",
       activeSceneIndex: 0,
-      narrationEnabled: true,
+      narrationEnabled: data.has_voiceover || false,
       pendingRevisions: [],
     }
 
+    // Now let's create the prompt_history entry / user message in the DB
+    await api.POST("/api/v1/messages", {
+      body: {
+        project_id: data.id,
+        raw_prompt: promptText,
+      }
+    })
+
     const starterScenes: Scene[] = [
       {
-        id: `s_${newId}_starter`,
+        id: `s_${data.id}_starter`,
         order: 1,
         title: "Introduction",
         description: `Visualise the core concept: "${promptText}"`,
@@ -400,7 +447,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
     const userMessage: Message = {
       id: `m_user_${Date.now()}`,
-      projectId: newId,
+      projectId: data.id,
       role: "user",
       content: promptText,
       timestamp: new Date().toISOString(),
@@ -408,11 +455,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
     set((state) => ({
       projects: [newProject, ...state.projects],
-      activeProjectId: newId,
+      activeProjectId: data.id,
       messages: [...state.messages, userMessage],
       scenePlans: {
         ...state.scenePlans,
-        [newId]: starterScenes,
+        [data.id]: starterScenes,
       },
     }))
 
@@ -420,7 +467,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     setTimeout(() => {
       const assistantMessage: Message = {
         id: `m_ast_${Date.now()}`,
-        projectId: newId,
+        projectId: data.id,
         role: "assistant",
         content: `I've constructed a proposed scene outline for your topic: "${promptText}". You can see it below. I've designed three main visual stages: an introduction to establish the concepts, a main visual deep-dive showing the core mechanics, and a final summary. Please review and click Approve to generate!`,
         timestamp: new Date().toISOString(),
@@ -428,11 +475,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
       set((state) => {
         const updatedProjects = state.projects.map((p) =>
-          p.id === newId ? { ...p, status: "plan_review" as const } : p
+          p.id === data.id ? { ...p, status: "plan_review" as const } : p
         )
         const outlineScenes: Scene[] = [
           {
-            id: `s_${newId}_1`,
+            id: `s_${data.id}_1`,
             order: 1,
             title: "Introduction & Setup",
             description: `Define and setup the basic visual grid for: ${promptText}.`,
@@ -442,7 +489,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
             code: `# Code block for setup`,
           },
           {
-            id: `s_${newId}_2`,
+            id: `s_${data.id}_2`,
             order: 2,
             title: "Core Mechanics Demonstration",
             description: "Dynamic visual transformation illustrating the core formula/logic.",
@@ -452,7 +499,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
             code: `# Code block for core visuals`,
           },
           {
-            id: `s_${newId}_3`,
+            id: `s_${data.id}_3`,
             order: 3,
             title: "Mathematical Summary",
             description: "Write out final equations and summarize with highlighting overlays.",
@@ -465,7 +512,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
         const scenePlanMsg: Message = {
           id: `m_sp_${Date.now()}`,
-          projectId: newId,
+          projectId: data.id,
           role: "scene_plan",
           content: "",
           timestamp: new Date().toISOString(),
@@ -476,13 +523,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           messages: [...state.messages, assistantMessage, scenePlanMsg],
           scenePlans: {
             ...state.scenePlans,
-            [newId]: outlineScenes,
+            [data.id]: outlineScenes,
           },
         }
       })
     }, 1500)
 
-    return newId
+    return data.id
   },
 
   sendMessage: (content) => {
