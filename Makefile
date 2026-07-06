@@ -8,13 +8,13 @@ dev-web:
 	cd apps/web && bun dev
 
 dev-api:
-	uv run uvicorn mova.main:app --reload --app-dir apps/api/src
+	uv run uvicorn visora.main:app --reload --app-dir apps/api/src
 
 dev-worker-fast:
-	uv run celery -A mova_workers.celery_app worker -Q fast --loglevel=info
+	uv run celery -A visora_workers.celery_app worker -Q fast --loglevel=info
 
 dev-worker-render:
-	uv run celery -A mova_workers.celery_app worker -Q render --loglevel=info
+	uv run celery -A visora_workers.celery_app worker -Q render --loglevel=info
 
 gen-types:
 	uv run python scripts/generate_ts_types.py

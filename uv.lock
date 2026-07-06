@@ -8,14 +8,14 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "mova-agents",
-    "mova-api",
-    "mova-db",
-    "mova-mcp",
-    "mova-rag",
-    "mova-schemas",
-    "mova-tools",
-    "mova-workers",
+    "visora-agents",
+    "visora-api",
+    "visora-db",
+    "visora-mcp",
+    "visora-rag",
+    "visora-schemas",
+    "visora-tools",
+    "visora-workers",
 ]
 
 [[package]]
@@ -2751,180 +2751,6 @@ wheels = [
 ]
 
 [[package]]
-name = "mova-agents"
-version = "0.1.0"
-source = { editable = "packages/agents" }
-dependencies = [
-    { name = "langchain" },
-    { name = "langchain-core" },
-    { name = "langgraph" },
-    { name = "langsmith" },
-    { name = "mova-rag" },
-    { name = "mova-schemas" },
-    { name = "mova-tools" },
-    { name = "pydantic-ai" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "langchain", specifier = ">=0.3" },
-    { name = "langchain-core", specifier = ">=0.3" },
-    { name = "langgraph", specifier = ">=0.2" },
-    { name = "langsmith", specifier = ">=0.1" },
-    { name = "mova-rag", editable = "packages/rag" },
-    { name = "mova-schemas", editable = "packages/schemas" },
-    { name = "mova-tools", editable = "packages/tools" },
-    { name = "pydantic-ai", specifier = ">=0.0.14" },
-]
-
-[[package]]
-name = "mova-api"
-version = "0.1.0"
-source = { editable = "apps/api" }
-dependencies = [
-    { name = "fastapi" },
-    { name = "mova-agents" },
-    { name = "mova-db" },
-    { name = "mova-schemas" },
-    { name = "mova-workers" },
-    { name = "pydantic-settings" },
-    { name = "python-multipart" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.111" },
-    { name = "mova-agents", editable = "packages/agents" },
-    { name = "mova-db", editable = "packages/db" },
-    { name = "mova-schemas", editable = "packages/schemas" },
-    { name = "mova-workers", editable = "packages/workers" },
-    { name = "pydantic-settings", specifier = ">=2.0" },
-    { name = "python-multipart", specifier = ">=0.0.9" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
-]
-
-[[package]]
-name = "mova-db"
-version = "0.1.0"
-source = { editable = "packages/db" }
-dependencies = [
-    { name = "asyncpg" },
-    { name = "redis" },
-    { name = "supabase" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "asyncpg", specifier = ">=0.29" },
-    { name = "redis", specifier = ">=5.0" },
-    { name = "supabase", specifier = ">=2.0" },
-]
-
-[[package]]
-name = "mova-mcp"
-version = "0.1.0"
-source = { editable = "packages/mcp" }
-dependencies = [
-    { name = "mcp" },
-    { name = "mova-rag" },
-    { name = "mova-schemas" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "mcp", specifier = ">=1.0" },
-    { name = "mova-rag", editable = "packages/rag" },
-    { name = "mova-schemas", editable = "packages/schemas" },
-]
-
-[[package]]
-name = "mova-rag"
-version = "0.1.0"
-source = { editable = "packages/rag" }
-dependencies = [
-    { name = "langchain" },
-    { name = "langchain-community" },
-    { name = "llama-index" },
-    { name = "mova-db" },
-    { name = "mova-schemas" },
-    { name = "pageindex" },
-    { name = "supabase" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "langchain", specifier = ">=0.3" },
-    { name = "langchain-community", specifier = ">=0.3" },
-    { name = "llama-index", specifier = ">=0.11" },
-    { name = "mova-db", editable = "packages/db" },
-    { name = "mova-schemas", editable = "packages/schemas" },
-    { name = "pageindex", specifier = ">=0.1" },
-    { name = "supabase", specifier = ">=2.0" },
-]
-
-[[package]]
-name = "mova-schemas"
-version = "0.1.0"
-source = { editable = "packages/schemas" }
-dependencies = [
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "pydantic", specifier = ">=2.0" },
-    { name = "pydantic-settings", specifier = ">=2.0" },
-]
-
-[[package]]
-name = "mova-tools"
-version = "0.1.0"
-source = { editable = "packages/tools" }
-dependencies = [
-    { name = "httpx" },
-    { name = "mova-rag" },
-    { name = "mova-schemas" },
-    { name = "playwright" },
-    { name = "youtube-transcript-api" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "httpx", specifier = ">=0.27" },
-    { name = "mova-rag", editable = "packages/rag" },
-    { name = "mova-schemas", editable = "packages/schemas" },
-    { name = "playwright", specifier = ">=1.44" },
-    { name = "youtube-transcript-api", specifier = ">=0.6" },
-]
-
-[[package]]
-name = "mova-workers"
-version = "0.1.0"
-source = { editable = "packages/workers" }
-dependencies = [
-    { name = "celery" },
-    { name = "manim" },
-    { name = "mova-agents" },
-    { name = "mova-db" },
-    { name = "mova-rag" },
-    { name = "mova-schemas" },
-    { name = "redis" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "celery", specifier = ">=5.3" },
-    { name = "manim", specifier = ">=0.18" },
-    { name = "mova-agents", editable = "packages/agents" },
-    { name = "mova-db", editable = "packages/db" },
-    { name = "mova-rag", editable = "packages/rag" },
-    { name = "mova-schemas", editable = "packages/schemas" },
-    { name = "redis", specifier = ">=5.0" },
-]
-
-[[package]]
 name = "multidict"
 version = "6.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -5460,6 +5286,180 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bd/e4/d07b5f29d283596b9727dd5275ccbceb63c44a1a82aa9e4bfd20426762ac/vine-5.1.0.tar.gz", hash = "sha256:8b62e981d35c41049211cf62a0a1242d8c1ee9bd15bb196ce38aefd6799e61e0", size = 48980, upload-time = "2023-11-05T08:46:53.857Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/03/ff/7c0c86c43b3cbb927e0ccc0255cb4057ceba4799cd44ae95174ce8e8b5b2/vine-5.1.0-py3-none-any.whl", hash = "sha256:40fdf3c48b2cfe1c38a49e9ae2da6fda88e4794c810050a728bd7413811fb1dc", size = 9636, upload-time = "2023-11-05T08:46:51.205Z" },
+]
+
+[[package]]
+name = "visora-agents"
+version = "0.1.0"
+source = { editable = "packages/agents" }
+dependencies = [
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "langgraph" },
+    { name = "langsmith" },
+    { name = "pydantic-ai" },
+    { name = "visora-rag" },
+    { name = "visora-schemas" },
+    { name = "visora-tools" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "langchain", specifier = ">=0.3" },
+    { name = "langchain-core", specifier = ">=0.3" },
+    { name = "langgraph", specifier = ">=0.2" },
+    { name = "langsmith", specifier = ">=0.1" },
+    { name = "pydantic-ai", specifier = ">=0.0.14" },
+    { name = "visora-rag", editable = "packages/rag" },
+    { name = "visora-schemas", editable = "packages/schemas" },
+    { name = "visora-tools", editable = "packages/tools" },
+]
+
+[[package]]
+name = "visora-api"
+version = "0.1.0"
+source = { editable = "apps/api" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "pydantic-settings" },
+    { name = "python-multipart" },
+    { name = "uvicorn", extra = ["standard"] },
+    { name = "visora-agents" },
+    { name = "visora-db" },
+    { name = "visora-schemas" },
+    { name = "visora-workers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.111" },
+    { name = "pydantic-settings", specifier = ">=2.0" },
+    { name = "python-multipart", specifier = ">=0.0.9" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
+    { name = "visora-agents", editable = "packages/agents" },
+    { name = "visora-db", editable = "packages/db" },
+    { name = "visora-schemas", editable = "packages/schemas" },
+    { name = "visora-workers", editable = "packages/workers" },
+]
+
+[[package]]
+name = "visora-db"
+version = "0.1.0"
+source = { editable = "packages/db" }
+dependencies = [
+    { name = "asyncpg" },
+    { name = "redis" },
+    { name = "supabase" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "asyncpg", specifier = ">=0.29" },
+    { name = "redis", specifier = ">=5.0" },
+    { name = "supabase", specifier = ">=2.0" },
+]
+
+[[package]]
+name = "visora-mcp"
+version = "0.1.0"
+source = { editable = "packages/mcp" }
+dependencies = [
+    { name = "mcp" },
+    { name = "visora-rag" },
+    { name = "visora-schemas" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "mcp", specifier = ">=1.0" },
+    { name = "visora-rag", editable = "packages/rag" },
+    { name = "visora-schemas", editable = "packages/schemas" },
+]
+
+[[package]]
+name = "visora-rag"
+version = "0.1.0"
+source = { editable = "packages/rag" }
+dependencies = [
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "llama-index" },
+    { name = "pageindex" },
+    { name = "supabase" },
+    { name = "visora-db" },
+    { name = "visora-schemas" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "langchain", specifier = ">=0.3" },
+    { name = "langchain-community", specifier = ">=0.3" },
+    { name = "llama-index", specifier = ">=0.11" },
+    { name = "pageindex", specifier = ">=0.1" },
+    { name = "supabase", specifier = ">=2.0" },
+    { name = "visora-db", editable = "packages/db" },
+    { name = "visora-schemas", editable = "packages/schemas" },
+]
+
+[[package]]
+name = "visora-schemas"
+version = "0.1.0"
+source = { editable = "packages/schemas" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.0" },
+    { name = "pydantic-settings", specifier = ">=2.0" },
+]
+
+[[package]]
+name = "visora-tools"
+version = "0.1.0"
+source = { editable = "packages/tools" }
+dependencies = [
+    { name = "httpx" },
+    { name = "playwright" },
+    { name = "visora-rag" },
+    { name = "visora-schemas" },
+    { name = "youtube-transcript-api" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.27" },
+    { name = "playwright", specifier = ">=1.44" },
+    { name = "visora-rag", editable = "packages/rag" },
+    { name = "visora-schemas", editable = "packages/schemas" },
+    { name = "youtube-transcript-api", specifier = ">=0.6" },
+]
+
+[[package]]
+name = "visora-workers"
+version = "0.1.0"
+source = { editable = "packages/workers" }
+dependencies = [
+    { name = "celery" },
+    { name = "manim" },
+    { name = "redis" },
+    { name = "visora-agents" },
+    { name = "visora-db" },
+    { name = "visora-rag" },
+    { name = "visora-schemas" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "celery", specifier = ">=5.3" },
+    { name = "manim", specifier = ">=0.18" },
+    { name = "redis", specifier = ">=5.0" },
+    { name = "visora-agents", editable = "packages/agents" },
+    { name = "visora-db", editable = "packages/db" },
+    { name = "visora-rag", editable = "packages/rag" },
+    { name = "visora-schemas", editable = "packages/schemas" },
 ]
 
 [[package]]

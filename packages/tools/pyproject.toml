@@ -1,18 +1,18 @@
 [project]
-name = "mova-tools"
+name = "visora-tools"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-  "mova-schemas",
-  "mova-rag",
+  "visora-schemas",
+  "visora-rag",
   "httpx>=0.27",
   "playwright>=1.44",
   "youtube-transcript-api>=0.6"
 ]
 
 [tool.uv.sources]
-mova-schemas = { workspace = true }
-mova-rag = { workspace = true }
+visora-schemas = { workspace = true }
+visora-rag = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
