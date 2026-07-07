@@ -88,7 +88,8 @@ async def generate_scene_code(scene_id: UUID, current_user: dict = Depends(get_c
         "Important Rules:\n"
         "1. Output ONLY valid, executable Python code.\n"
         "2. The code should define a Manim Scene class.\n"
-        "3. Do not include markdown code block formatting (like ```python) or any explanation. Start directly with imports (e.g. from manim import *)."
+        "3. Ensure all open parentheses, brackets, and braces are correctly closed. The code must be syntactically valid Python.\n"
+        "4. Do not include markdown code block formatting (like ```python) or any explanation. Start directly with imports (e.g. from manim import *)."
     )
     api_messages = [
         {"role": "system", "content": system_prompt},

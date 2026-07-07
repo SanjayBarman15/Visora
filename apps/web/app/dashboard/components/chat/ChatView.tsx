@@ -43,11 +43,15 @@ export function ChatView() {
     setInitPromptText(text)
   }
 
-  const handleInitSubmit = (e: React.FormEvent) => {
+  const handleInitSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!initPromptText.trim()) return
-    const newId = startNewProject(initPromptText)
-    router.push(`/dashboard/project/${newId}`)
+    try {
+      const newId = await startNewProject(initPromptText)
+      router.push(`/dashboard/project/${newId}`)
+    } catch (err) {
+      console.error(err)
+    }
     setInitPromptText("")
   }
 
