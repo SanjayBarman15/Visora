@@ -10,7 +10,8 @@ dependencies = [
   "langchain>=0.3",
   "langchain-core>=0.3",
   "pydantic-ai>=0.0.14",
-  "langsmith>=0.1"
+  "langsmith>=0.1",
+  "pydantic-settings>=2.0.0"
 ]
 
 [tool.uv.sources]
