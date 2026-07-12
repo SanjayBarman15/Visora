@@ -3,16 +3,13 @@ import { redirect } from 'next/navigation'
 import { signout } from '@/app/auth/actions'
 import { Button } from '@/components/ui/button'
 import {
-  Activity,
-  LogOut,
-  User as UserIcon,
-  Video,
-  Layers,
-  Settings,
-  FolderOpen,
+  Sparkles,
   Plus,
-  Compass,
-  CreditCard
+  Mic,
+  Volume2,
+  ChevronDown,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react'
 
 export default async function DashboardPage() {
@@ -34,156 +31,156 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
-  // Retrieve project listing from projects table
-  const { data: projects } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+  const displayName = profile?.display_name || user.email?.split('@')[0] || 'Casano'
 
-  const totalProjects = projects?.length || 0
-  const completedProjects = projects?.filter((p) => p.status === 'completed').length || 0
+  // Determine current greeting based on local time
+  const hour = new Date().getHours()
+  let greetingWord = 'Evening'
+  if (hour < 12) {
+    greetingWord = 'Morning'
+  } else if (hour < 17) {
+    greetingWord = 'Afternoon'
+  }
 
   return (
-    <div className="min-h-svh bg-zinc-950 text-white flex flex-col">
-      {/* Navbar */}
-      <header className="border-b border-zinc-900 bg-zinc-950/60 backdrop-blur-xl sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
-            <Activity className="h-5 w-5 text-indigo-400 animate-pulse" />
-            VISORA
-          </div>
+    <div className="min-h-svh bg-zinc-950 text-white flex flex-col justify-between relative overflow-hidden select-none">
+      {/* Background radial gradients for premium feel */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/5 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-violet-600/5 blur-[150px] pointer-events-none" />
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex flex-col text-right">
-              <span className="text-sm font-medium text-zinc-200">
-                {profile?.display_name || user.email?.split('@')[0]}
-              </span>
-              <span className="text-xs text-zinc-500">{user.email}</span>
+      {/* Top Navbar */}
+      <header className="w-full px-6 py-4 flex justify-between items-center z-10">
+        <div className="flex-1" />
+        
+        {/* Top Center: Plan Badge */}
+        <div className="flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-400 font-medium">
+          <span>Free plan</span>
+          <span className="text-zinc-600">•</span>
+          <button className="text-zinc-200 hover:text-white transition-colors cursor-pointer font-semibold">
+            Upgrade
+          </button>
+        </div>
+
+        {/* Top Right: User Profile Menu / Sign Out */}
+        <div className="flex-1 flex justify-end items-center gap-4">
+          <div className="group relative">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center cursor-pointer shadow-md shadow-indigo-500/10">
+              <UserIcon className="h-4 w-4 text-white" />
             </div>
-            <form action={signout}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-zinc-400 hover:text-white hover:bg-zinc-900 cursor-pointer flex items-center gap-1.5"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </Button>
-            </form>
+            {/* Simple dropdown hover list for logout */}
+            <div className="absolute right-0 top-9 w-40 bg-zinc-900 border border-zinc-800 rounded-xl p-2 hidden group-hover:block hover:block shadow-2xl z-50">
+              <form action={signout}>
+                <button
+                  type="submit"
+                  className="w-full text-left px-3 py-2 text-xs text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <LogOut className="h-3.5 w-3.5" /> Sign Out
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Dashboard Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-10 flex flex-col gap-8">
-        {/* Profile Card / Header Banner */}
-        <div className="relative overflow-hidden border border-zinc-900 bg-radial from-zinc-900/60 to-zinc-950 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="absolute top-[-20%] right-[-10%] w-[30%] h-[120%] rounded-full bg-indigo-500/10 blur-[80px] pointer-events-none" />
-
-          <div className="flex items-center gap-4 z-10">
-            <div className="h-14 w-14 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <UserIcon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white">
-                Hello, {profile?.display_name || 'Creator'}!
-              </h2>
-              <p className="text-sm text-zinc-400 mt-0.5">
-                Manage your video creation and analysis projects below.
-              </p>
-            </div>
+      {/* Centered Main Area */}
+      <main className="flex-1 flex flex-col justify-center items-center px-4 max-w-3xl w-full mx-auto z-10">
+        
+        {/* Greeting Section */}
+        <div className="flex items-center gap-3 mb-8 animate-fade-in">
+          {/* Salmon/Orange pointed star icon */}
+          <div className="relative flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-amber-500/80 fill-current"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+            </svg>
           </div>
-
-          <div className="flex flex-wrap gap-3 z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50 text-xs font-medium text-zinc-300">
-              <CreditCard className="h-3.5 w-3.5 text-zinc-400" />
-              <span>Tier: <span className="text-indigo-400 capitalize">{profile?.subscription_tier || 'free'}</span></span>
-            </div>
-            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer rounded-xl flex items-center gap-1.5 shadow-md shadow-indigo-600/10 border-0">
-              <Plus className="h-4 w-4" /> New Project
-            </Button>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-serif tracking-wide text-zinc-200">
+            {greetingWord}, {displayName}
+          </h1>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="border border-zinc-900 bg-zinc-900/20 rounded-2xl p-6 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-zinc-500 mb-4">
-              <span className="text-sm font-semibold uppercase tracking-wider">Total Projects</span>
-              <FolderOpen className="h-5 w-5 text-indigo-400" />
-            </div>
-            <div>
-              <span className="text-3xl font-extrabold">{totalProjects}</span>
-              <p className="text-xs text-zinc-500 mt-1">Draft or active video projects</p>
+        {/* Chat Card Box */}
+        <div className="w-full border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-xl rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+          
+          {/* Message Area */}
+          <div className="w-full">
+            <textarea
+              rows={2}
+              placeholder="How can I help you today?"
+              className="w-full bg-transparent border-0 outline-none text-zinc-200 placeholder-zinc-500 resize-none text-base focus:ring-0 p-0"
+            />
+          </div>
+
+          {/* Controls Bar */}
+          <div className="flex justify-between items-center pt-2 border-t border-zinc-800/50">
+            
+            {/* Attachment Button */}
+            <button className="h-8 w-8 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 hover:text-white text-zinc-400 flex items-center justify-center cursor-pointer transition-colors">
+              <Plus className="h-4 w-4" />
+            </button>
+
+            {/* Configs (Model, Mic, Speaker) */}
+            <div className="flex items-center gap-3">
+              {/* Model Dropdown Selection */}
+              <button className="h-8 px-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 text-xs text-zinc-300 flex items-center gap-1.5 cursor-pointer transition-colors font-medium">
+                <span>Sonnet 5 Medium</span>
+                <ChevronDown className="h-3 w-3 text-zinc-500" />
+              </button>
+
+              {/* Mic Icon */}
+              <button className="h-8 w-8 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 hover:text-white text-zinc-400 flex items-center justify-center cursor-pointer transition-colors">
+                <Mic className="h-3.5 w-3.5" />
+              </button>
+
+              {/* Audio Waves Icon */}
+              <button className="h-8 w-8 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 hover:text-white text-zinc-400 flex items-center justify-center cursor-pointer transition-colors">
+                <Volume2 className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
 
-          <div className="border border-zinc-900 bg-zinc-900/20 rounded-2xl p-6 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-zinc-500 mb-4">
-              <span className="text-sm font-semibold uppercase tracking-wider">Videos Completed</span>
-              <Video className="h-5 w-5 text-emerald-400" />
+          {/* Usage Limits Section */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-3 border-t border-zinc-800/30 text-[10px] text-zinc-500 font-medium tracking-wide">
+            
+            {/* Session Indicator */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="shrink-0 uppercase">Session: 0%</span>
+              <div className="w-full sm:w-32 h-1 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800/50">
+                <div className="h-full bg-zinc-700 w-0 rounded-full" />
+              </div>
             </div>
-            <div>
-              <span className="text-3xl font-extrabold">{completedProjects}</span>
-              <p className="text-xs text-zinc-500 mt-1">Rendered and compiled clips</p>
-            </div>
-          </div>
 
-          <div className="border border-zinc-900 bg-zinc-900/20 rounded-2xl p-6 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-zinc-500 mb-4">
-              <span className="text-sm font-semibold uppercase tracking-wider">System Integration</span>
-              <Layers className="h-5 w-5 text-cyan-400" />
+            {/* Splitter Circle Indicator */}
+            <div className="hidden sm:flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50" />
             </div>
-            <div>
-              <span className="text-3xl font-extrabold text-indigo-400">Active</span>
-              <p className="text-xs text-zinc-500 mt-1">Supabase database connected</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Projects Listing */}
-        <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-bold tracking-tight">Your Projects</h3>
-
-          {projects && projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {projects.map((project) => (
-                <div
-                  key={project.id}
-                  className="border border-zinc-900 bg-zinc-900/30 rounded-2xl p-6 hover:border-zinc-800 transition-all flex flex-col justify-between gap-4"
-                >
-                  <div>
-                    <h4 className="font-semibold text-zinc-200">{project.title}</h4>
-                    <p className="text-xs text-zinc-500 mt-1">
-                      Status: <span className="capitalize text-indigo-400">{project.status}</span>
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-zinc-500 pt-4 border-t border-zinc-900/85">
-                    <span>Scenes: {project.completed_scenes}/{project.total_scenes}</span>
-                    <span>Created: {new Date(project.created_at).toLocaleDateString()}</span>
-                  </div>
+            {/* Weekly Limit Indicator */}
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+              <div className="flex items-center gap-2">
+                <span className="shrink-0 uppercase">Weekly: 31%</span>
+                <div className="w-24 sm:w-28 h-1 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800/50">
+                  <div className="h-full bg-zinc-700 w-[31%] rounded-full" />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="border border-dashed border-zinc-800 rounded-2xl p-12 text-center flex flex-col items-center justify-center gap-4 bg-zinc-900/5">
-              <div className="h-12 w-12 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                <FolderOpen className="h-5 w-5 text-zinc-500" />
               </div>
-              <div>
-                <h4 className="font-semibold text-zinc-300">No projects yet</h4>
-                <p className="text-sm text-zinc-500 mt-1">
-                  Create your first project to start rendering animations.
-                </p>
-              </div>
-              <Button size="sm" className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer rounded-xl flex items-center gap-1.5">
-                <Plus className="h-4 w-4" /> Add Project
-              </Button>
+              <span className="text-zinc-600 text-[9px] shrink-0 font-normal ml-1">
+                resets in 5d 13h
+              </span>
             </div>
-          )}
+
+          </div>
+
         </div>
+
       </main>
+
+      {/* Footer */}
+      <footer className="w-full text-center py-4 text-[10px] text-zinc-600 z-10">
+        Powered by Supabase Auth & NVIDIA NIM API
+      </footer>
     </div>
   )
 }
