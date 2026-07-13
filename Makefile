@@ -8,7 +8,7 @@ dev-web:
 	cd apps/web && bun dev
 
 dev-api:
-	uv run uvicorn visora.main:app --reload --app-dir apps/api/src
+	uv run python -m uvicorn visora.main:app --reload --app-dir apps/api/src
 
 dev-worker-fast:
 	uv run celery -A visora_workers.celery_app worker -Q fast --loglevel=info
