@@ -2,12 +2,12 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { signout } from '@/app/auth/actions'
 import { Button } from '@/components/ui/button'
+import { ModelDropdown } from '@/components/model-dropdown'
 import {
   Sparkles,
   Plus,
   Mic,
-  Volume2,
-  ChevronDown,
+  ArrowUp,
   LogOut,
   User as UserIcon
 } from 'lucide-react'
@@ -122,30 +122,26 @@ export default async function DashboardPage() {
               <Plus className="h-4 w-4" />
             </button>
 
-            {/* Configs (Model, Mic, Speaker) */}
+            {/* Configs (Model, Mic, Send) */}
             <div className="flex items-center gap-3">
               {/* Model Dropdown Selection */}
-              <button className="h-8 px-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 text-xs text-zinc-300 flex items-center gap-1.5 cursor-pointer transition-colors font-medium">
-                <span>Sonnet 5 Medium</span>
-                <ChevronDown className="h-3 w-3 text-zinc-500" />
-              </button>
+              <ModelDropdown />
 
               {/* Mic Icon */}
               <button className="h-8 w-8 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 hover:text-white text-zinc-400 flex items-center justify-center cursor-pointer transition-colors">
                 <Mic className="h-3.5 w-3.5" />
               </button>
 
-              {/* Audio Waves Icon */}
-              <button className="h-8 w-8 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 hover:text-white text-zinc-400 flex items-center justify-center cursor-pointer transition-colors">
-                <Volume2 className="h-3.5 w-3.5" />
+              {/* Send Button */}
+              <button className="h-8 w-8 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 flex items-center justify-center cursor-pointer transition-colors shadow-md shadow-zinc-100/10">
+                <ArrowUp className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          {/* Usage Limits Section */}
+          {/* Usage Limits Section commented out */}
+          {/* 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-3 border-t border-zinc-800/30 text-[10px] text-zinc-500 font-medium tracking-wide">
-            
-            {/* Session Indicator */}
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <span className="shrink-0 uppercase">Session: 0%</span>
               <div className="w-full sm:w-32 h-1 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800/50">
@@ -153,12 +149,10 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* Splitter Circle Indicator */}
             <div className="hidden sm:flex items-center justify-center">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50" />
             </div>
 
-            {/* Weekly Limit Indicator */}
             <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
               <div className="flex items-center gap-2">
                 <span className="shrink-0 uppercase">Weekly: 31%</span>
@@ -170,8 +164,8 @@ export default async function DashboardPage() {
                 resets in 5d 13h
               </span>
             </div>
-
           </div>
+          */}
 
         </div>
 
