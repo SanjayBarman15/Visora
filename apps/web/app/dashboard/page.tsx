@@ -38,7 +38,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-svh bg-zinc-950 text-white flex flex-col justify-between relative overflow-hidden select-none">
+    <div className="h-screen bg-zinc-950 text-white flex flex-col relative overflow-hidden select-none">
       {/* Background radial gradients for premium feel */}
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/5 blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-violet-600/5 blur-[150px] pointer-events-none" />
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
       </header>
 
       {/* Centered Main Area */}
-      <main className="flex-1 flex flex-col justify-center items-center px-4 max-w-3xl w-full mx-auto z-10">
+      <main className="flex-1 flex flex-col items-center px-4 max-w-3xl w-full mx-auto z-10 min-h-0">
         <ChatContainer displayName={displayName} greetingWord={greetingWord} />
       </main>
 

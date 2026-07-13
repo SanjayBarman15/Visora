@@ -13,11 +13,16 @@ interface ChatContainerProps {
 export function ChatContainer({ displayName, greetingWord }: ChatContainerProps) {
   const { messages, requirements, isGenerating, sendMessage } = useVisoraStore()
   const [input, setInput] = useState('')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   // Auto scroll to bottom when messages update
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
   }, [messages, isGenerating])
 
   const handleSend = async () => {
@@ -48,7 +53,9 @@ export function ChatContainer({ displayName, greetingWord }: ChatContainerProps)
   const hasMessages = messages.length > 0
 
   return (
-    <div className="w-full max-w-3xl flex flex-col gap-6 relative z-10">
+    <div className={`w-full max-w-3xl flex flex-col relative z-10 min-h-0 ${
+      hasMessages ? 'flex-1 justify-between pb-4 pt-2 gap-4' : 'justify-center flex-1 gap-6'
+    }`}>
       
       {/* 1. Empty State (when no messages) */}
       {!hasMessages && (
@@ -75,7 +82,10 @@ export function ChatContainer({ displayName, greetingWord }: ChatContainerProps)
 
       {/* 2. Chat Messages Stream */}
       {hasMessages && (
-        <div className="w-full flex flex-col gap-4 overflow-y-auto max-h-[60vh] pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+        <div
+          ref={scrollRef}
+          className="w-full flex flex-col gap-4 overflow-y-auto flex-1 pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+        >
           {messages.map((message) => (
             <div
               key={message.id}
@@ -126,7 +136,6 @@ export function ChatContainer({ displayName, greetingWord }: ChatContainerProps)
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
       )}
 

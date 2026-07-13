@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -20,9 +20,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
+      className={cn("antialiased h-screen overflow-hidden", fontMono.variable, "font-sans", inter.variable)}
     >
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className="h-screen overflow-hidden">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
