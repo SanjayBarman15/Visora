@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useVisoraStore } from '@/store/useVisoraStore'
 import { ModelDropdown } from '@/components/model-dropdown'
 import { ScenePlanCard } from '@/components/scene-plan-card'
+import { gooeyToast } from '@/components/ui/goey-toaster'
 import { Plus, Mic, ArrowUp, Sparkles, User as UserIcon } from 'lucide-react'
 
 interface ChatContainerProps {
@@ -12,7 +13,7 @@ interface ChatContainerProps {
 }
 
 export function ChatContainer({ displayName, greetingWord }: ChatContainerProps) {
-  const { messages, requirements, scenePlan, isGenerating, sendMessage, generateScenePlan } = useVisoraStore()
+  const { messages, requirements, scenePlan, forgeCode, isGenerating, sendMessage, generateScenePlan } = useVisoraStore()
   const [input, setInput] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -130,6 +131,34 @@ export function ChatContainer({ displayName, greetingWord }: ChatContainerProps)
               </div>
               <div className="flex-1 min-w-0">
                 <ScenePlanCard plan={scenePlan} />
+              </div>
+            </div>
+          )}
+
+          {/* Render Generated Forge Code if available */}
+          {forgeCode && (
+            <div className="flex gap-3 max-w-[85%] self-start w-full animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <div className="h-8 w-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 shadow-md">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+              </div>
+              <div className="flex-1 bg-zinc-900/80 border border-zinc-800/80 backdrop-blur-xl p-5 rounded-2xl space-y-4 shadow-2xl min-w-0">
+                <div className="flex items-center justify-between border-b border-zinc-800/50 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-zinc-300">Generated Manim Script</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(forgeCode.code)
+                      gooeyToast.success("Copied to clipboard!")
+                    }}
+                    className="text-[10px] text-zinc-500 hover:text-zinc-200 cursor-pointer bg-zinc-950 border border-zinc-800/80 px-2 py-1 rounded-md transition-colors"
+                  >
+                    Copy Code
+                  </button>
+                </div>
+                <pre className="text-[11px] text-zinc-400 overflow-x-auto p-4 bg-zinc-950/80 border border-zinc-900 rounded-xl max-h-[300px] scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent font-mono select-text">
+                  <code>{forgeCode.code}</code>
+                </pre>
               </div>
             </div>
           )}

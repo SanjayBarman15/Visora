@@ -25,13 +25,20 @@ export interface ScenePlan {
   key_visuals: string[]
 }
 
+export interface ForgeCode {
+  code: string
+  scene_class_name: string
+}
+
 interface VisoraState {
   messages: Message[]
   requirements: ElicitationRequirements
   scenePlan: ScenePlan | null
+  forgeCode: ForgeCode | null
   isGenerating: boolean
   sendMessage: (text: string) => Promise<void>
   generateScenePlan: () => Promise<void>
+  generateCode: () => Promise<void>
 }
 
 const defaultRequirements: ElicitationRequirements = {
@@ -49,6 +56,7 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
   messages: [],
   requirements: defaultRequirements,
   scenePlan: null,
+  forgeCode: null,
   isGenerating: false,
 
   sendMessage: async (text: string) => {
@@ -149,6 +157,43 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
         id: crypto.randomUUID(),
         role: 'assistant',
         content: 'Failed to generate the scene plan. Please try again.',
+        timestamp: new Date().toISOString(),
+      }
+      set((state) => ({
+        messages: [...state.messages, errorMessage],
+      }))
+    } finally {
+      set({ isGenerating: false })
+    }
+  },
+
+  generateCode: async () => {
+    const currentPlan = get().scenePlan
+    if (!currentPlan) return
+
+    set({ isGenerating: true })
+
+    try {
+      const response = await fetch('http://localhost:8000/api/planning/forge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentPlan),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate code')
+      }
+
+      const forgeCode: ForgeCode = await response.json()
+      set({ forgeCode })
+    } catch (error) {
+      console.error('Error generating code:', error)
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: 'Failed to generate code. Please try again.',
         timestamp: new Date().toISOString(),
       }
       set((state) => ({

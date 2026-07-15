@@ -1,16 +1,19 @@
 'use client'
 
-import { ScenePlan } from '@/store/useVisoraStore'
+import { ScenePlan, useVisoraStore } from '@/store/useVisoraStore'
 import { gooeyToast } from '@/components/ui/goey-toaster'
-import { CheckCircle2, Clapperboard, Timer, ListTodo } from 'lucide-react'
+import { CheckCircle2, Clapperboard, Timer, ListTodo, Loader2 } from 'lucide-react'
 
 interface ScenePlanCardProps {
   plan: ScenePlan
 }
 
 export function ScenePlanCard({ plan }: ScenePlanCardProps) {
-  const handleApprove = () => {
-    gooeyToast.success('Plan approved — generation started!')
+  const { generateCode, isGenerating, forgeCode } = useVisoraStore()
+
+  const handleApprove = async () => {
+    gooeyToast.success('Plan approved — generating code!')
+    await generateCode()
   }
 
   return (
@@ -63,10 +66,25 @@ export function ScenePlanCard({ plan }: ScenePlanCardProps) {
       {/* Action Button */}
       <button
         onClick={handleApprove}
-        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-medium text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 transition-all duration-200"
+        disabled={isGenerating || !!forgeCode}
+        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 transition-all duration-200"
       >
-        <CheckCircle2 className="h-4 w-4" />
-        <span>Approve & Start Generation</span>
+        {isGenerating ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Generating Scene Code...</span>
+          </>
+        ) : forgeCode ? (
+          <>
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <span>Code Generated Successfully</span>
+          </>
+        ) : (
+          <>
+            <CheckCircle2 className="h-4 w-4" />
+            <span>Approve & Start Generation</span>
+          </>
+        )}
       </button>
     </div>
   )

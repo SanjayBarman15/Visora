@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 # Load env variables (like NIM API Keys)
 load_dotenv()
 
-from visora_schemas import ElicitationRequirements, ScenePlan
-from visora_agents import run_scout_turn, run_orion_planner
+from visora_schemas import ElicitationRequirements, ScenePlan, ForgeCode
+from visora_agents import run_scout_turn, run_orion_planner, run_forge_generator
 
 app = FastAPI(title="Visora Backend API", version="0.1.0")
 
@@ -58,6 +58,15 @@ def planning_generate(payload: PlanningRequest):
         return scene_plan
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/planning/forge", response_model=ForgeCode)
+def planning_forge(payload: ScenePlan):
+    try:
+        forge_code = run_forge_generator(scene_plan=payload)
+        return forge_code
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     import uvicorn
