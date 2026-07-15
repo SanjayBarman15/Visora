@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 # Load env variables (like NIM API Keys)
 load_dotenv()
 
-from visora_schemas import ElicitationRequirements
-from visora_agents import run_scout_turn
+from visora_schemas import ElicitationRequirements, ScenePlan
+from visora_agents import run_scout_turn, run_orion_planner
 
 app = FastAPI(title="Visora Backend API", version="0.1.0")
 
@@ -30,6 +30,9 @@ class ElicitationResponse(BaseModel):
     response_text: str
     requirements: ElicitationRequirements
 
+class PlanningRequest(BaseModel):
+    messages: List[Dict[str, str]]
+
 @app.get("/health")
 def health_check():
     return {"status": "ok", "app": "Visora API"}
@@ -45,6 +48,14 @@ def elicitation_turn(payload: ElicitationRequest):
             response_text=response_text,
             requirements=updated_requirements
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/planning/generate", response_model=ScenePlan)
+def planning_generate(payload: PlanningRequest):
+    try:
+        scene_plan = run_orion_planner(messages=payload.messages)
+        return scene_plan
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

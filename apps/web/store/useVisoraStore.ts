@@ -18,11 +18,20 @@ export interface Message {
   timestamp: string
 }
 
+export interface ScenePlan {
+  title: string
+  description: string
+  duration_seconds: number
+  key_visuals: string[]
+}
+
 interface VisoraState {
   messages: Message[]
   requirements: ElicitationRequirements
+  scenePlan: ScenePlan | null
   isGenerating: boolean
   sendMessage: (text: string) => Promise<void>
+  generateScenePlan: () => Promise<void>
 }
 
 const defaultRequirements: ElicitationRequirements = {
@@ -39,6 +48,7 @@ const defaultRequirements: ElicitationRequirements = {
 export const useVisoraStore = create<VisoraState>((set, get) => ({
   messages: [],
   requirements: defaultRequirements,
+  scenePlan: null,
   isGenerating: false,
 
   sendMessage: async (text: string) => {
@@ -97,6 +107,48 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
         id: crypto.randomUUID(),
         role: 'assistant',
         content: 'Something went wrong while connecting to the assistant. Please try again.',
+        timestamp: new Date().toISOString(),
+      }
+      set((state) => ({
+        messages: [...state.messages, errorMessage],
+      }))
+    } finally {
+      set({ isGenerating: false })
+    }
+  },
+
+  generateScenePlan: async () => {
+    set({ isGenerating: true })
+
+    try {
+      const currentMessages = get().messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }))
+
+      const response = await fetch('http://localhost:8000/api/planning/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: currentMessages,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate scene plan')
+      }
+
+      const scenePlan: ScenePlan = await response.json()
+
+      set({ scenePlan })
+    } catch (error) {
+      console.error('Error generating scene plan:', error)
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: 'Failed to generate the scene plan. Please try again.',
         timestamp: new Date().toISOString(),
       }
       set((state) => ({

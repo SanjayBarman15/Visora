@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useVisoraStore } from '@/store/useVisoraStore'
 import { ModelDropdown } from '@/components/model-dropdown'
+import { ScenePlanCard } from '@/components/scene-plan-card'
 import { Plus, Mic, ArrowUp, Sparkles, User as UserIcon } from 'lucide-react'
 
 interface ChatContainerProps {
@@ -11,7 +12,7 @@ interface ChatContainerProps {
 }
 
 export function ChatContainer({ displayName, greetingWord }: ChatContainerProps) {
-  const { messages, requirements, isGenerating, sendMessage } = useVisoraStore()
+  const { messages, requirements, scenePlan, isGenerating, sendMessage, generateScenePlan } = useVisoraStore()
   const [input, setInput] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -121,8 +122,20 @@ export function ChatContainer({ displayName, greetingWord }: ChatContainerProps)
             </div>
           ))}
 
+          {/* Render Scene Plan Card if generated */}
+          {scenePlan && (
+            <div className="flex gap-3 max-w-[85%] self-start w-full">
+              <div className="h-8 w-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 shadow-md">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <ScenePlanCard plan={scenePlan} />
+              </div>
+            </div>
+          )}
+
           {/* Typing/Generating Indicator */}
-          {isGenerating && (
+          {isGenerating && !scenePlan && (
             <div className="flex gap-3 max-w-[80%] self-start animate-pulse">
               <div className="h-8 w-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
                 <Sparkles className="h-4 w-4 text-amber-500" />
@@ -178,6 +191,20 @@ export function ChatContainer({ displayName, greetingWord }: ChatContainerProps)
               Status: {requirements.is_complete ? 'Ready for Plan' : 'Collecting'}
             </span>
           </div>
+        </div>
+      )}
+
+      {/* Generate Scene Plan Action Call */}
+      {requirements.is_complete && !scenePlan && (
+        <div className="w-full flex justify-center py-1 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <button
+            onClick={generateScenePlan}
+            disabled={isGenerating}
+            className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-50 text-white rounded-xl font-medium text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-orange-500/10 transition-all duration-200"
+          >
+            <Sparkles className="h-4 w-4" />
+            {isGenerating ? 'Decomposing scene details...' : 'Generate Proposed Scene Plan'}
+          </button>
         </div>
       )}
 

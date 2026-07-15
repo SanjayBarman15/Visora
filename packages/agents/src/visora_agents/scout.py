@@ -45,6 +45,7 @@ def run_scout_turn(
         "7. Voiceover tone preference (tone of narration)\n\n"
         "Ask short, clarifying questions. Keep your replies brief. Do not ask for multiple things at once. "
         "If you already have enough information for a field, do not ask about it again. "
+        "CRITICAL: Output ONLY a conversational response. Do NOT output any JSON, code, or structured lists in your response. Speak to the user as a friendly assistant.\n\n"
         f"Current state of collected fields: {current_requirements.model_dump_json()}"
     )
     
