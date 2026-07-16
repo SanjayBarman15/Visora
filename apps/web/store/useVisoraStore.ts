@@ -31,11 +31,20 @@ export interface ForgeCode {
 }
 
 interface VisoraState {
+  // Project context — set once on project page load
+  projectId: string | null
+  sessionId: string | null
+
+  // Chat & generation state
   messages: Message[]
   requirements: ElicitationRequirements
   scenePlan: ScenePlan | null
   forgeCode: ForgeCode | null
   isGenerating: boolean
+
+  // Actions
+  initProject: (projectId: string, sessionId: string) => void
+  resetStore: () => void
   sendMessage: (text: string) => Promise<void>
   generateScenePlan: () => Promise<void>
   generateCode: () => Promise<void>
@@ -52,12 +61,26 @@ const defaultRequirements: ElicitationRequirements = {
   is_complete: false,
 }
 
-export const useVisoraStore = create<VisoraState>((set, get) => ({
+const defaultState = {
+  projectId: null,
+  sessionId: null,
   messages: [],
   requirements: defaultRequirements,
   scenePlan: null,
   forgeCode: null,
   isGenerating: false,
+}
+
+export const useVisoraStore = create<VisoraState>((set, get) => ({
+  ...defaultState,
+
+  initProject: (projectId: string, sessionId: string) => {
+    set({ projectId, sessionId })
+  },
+
+  resetStore: () => {
+    set(defaultState)
+  },
 
   sendMessage: async (text: string) => {
     if (!text.trim()) return
@@ -89,6 +112,9 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
         body: JSON.stringify({
           messages: currentMessages,
           requirements: currentRequirements,
+          // Future: add project_id and session_id here when backend supports it
+          // project_id: get().projectId,
+          // session_id: get().sessionId,
         }),
       })
 
@@ -141,6 +167,9 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
         },
         body: JSON.stringify({
           messages: currentMessages,
+          // Future: add project_id and session_id here when backend supports it
+          // project_id: get().projectId,
+          // session_id: get().sessionId,
         }),
       })
 
@@ -179,7 +208,12 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(currentPlan),
+        body: JSON.stringify({
+          ...currentPlan,
+          // Future: add project_id and session_id here when backend supports it
+          // project_id: get().projectId,
+          // session_id: get().sessionId,
+        }),
       })
 
       if (!response.ok) {
