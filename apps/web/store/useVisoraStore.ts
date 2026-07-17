@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+export type RenderStatus = 'idle' | 'pending' | 'rendering' | 'completed' | 'failed'
+
 export interface ElicitationRequirements {
   audience_level: string | null
   duration_target: number | null
@@ -42,12 +44,18 @@ interface VisoraState {
   forgeCode: ForgeCode | null
   isGenerating: boolean
 
+  // Render state
+  renderStatus: RenderStatus
+  clipUrl: string | null
+  checkpointId: string | null
+
   // Actions
   initProject: (projectId: string, sessionId: string) => void
   resetStore: () => void
   sendMessage: (text: string) => Promise<void>
   generateScenePlan: () => Promise<void>
   generateCode: () => Promise<void>
+  submitRender: () => Promise<void>
 }
 
 const defaultRequirements: ElicitationRequirements = {
@@ -69,6 +77,9 @@ const defaultState = {
   scenePlan: null,
   forgeCode: null,
   isGenerating: false,
+  renderStatus: 'idle' as RenderStatus,
+  clipUrl: null,
+  checkpointId: null,
 }
 
 export const useVisoraStore = create<VisoraState>((set, get) => ({
@@ -235,6 +246,39 @@ export const useVisoraStore = create<VisoraState>((set, get) => ({
       }))
     } finally {
       set({ isGenerating: false })
+    }
+  },
+
+  submitRender: async () => {
+    const { forgeCode, scenePlan, projectId } = get()
+    if (!forgeCode || !projectId) return
+
+    set({ renderStatus: 'pending', clipUrl: null, checkpointId: null })
+
+    try {
+      const response = await fetch('http://localhost:8000/api/render/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: projectId,
+          code: forgeCode.code,
+          scene_class_name: forgeCode.scene_class_name,
+          scene_title: scenePlan?.title ?? 'Scene',
+          scene_description: scenePlan?.description ?? '',
+          duration_seconds: scenePlan?.duration_seconds ?? 30,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit render job')
+      }
+
+      const data = await response.json()
+      // Store the checkpointId — the useRenderStatus hook will subscribe to it
+      set({ checkpointId: data.checkpoint_id, renderStatus: 'pending' })
+    } catch (error) {
+      console.error('Error submitting render:', error)
+      set({ renderStatus: 'failed' })
     }
   },
 }))

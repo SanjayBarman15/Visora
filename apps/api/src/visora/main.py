@@ -10,6 +10,7 @@ load_dotenv()
 
 from visora_schemas import ElicitationRequirements, ScenePlan, ForgeCode
 from visora_agents import run_scout_turn, run_orion_planner, run_forge_generator
+from visora.routers.render import router as render_router
 
 app = FastAPI(title="Visora Backend API", version="0.1.0")
 
@@ -21,6 +22,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(render_router)
 
 class ElicitationRequest(BaseModel):
     messages: List[Dict[str, str]]

@@ -5236,6 +5236,7 @@ dependencies = [
     { name = "uvicorn" },
     { name = "visora-agents" },
     { name = "visora-schemas" },
+    { name = "visora-workers" },
 ]
 
 [package.metadata]
@@ -5246,6 +5247,7 @@ requires-dist = [
     { name = "uvicorn", specifier = ">=0.28.0" },
     { name = "visora-agents", editable = "packages/agents" },
     { name = "visora-schemas", editable = "packages/schemas" },
+    { name = "visora-workers", editable = "packages/workers" },
 ]
 
 [[package]]

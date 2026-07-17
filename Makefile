@@ -1,4 +1,4 @@
-.PHONY: dev-web dev-api dev-worker install install-py gen-types eval ingest-docs
+.PHONY: dev-web dev-api dev-worker dev-worker-fast dev-worker-render install install-py gen-types eval ingest-docs
 	
 install:
 	bun install
@@ -11,10 +11,13 @@ dev-api:
 	uv run python -m uvicorn visora.main:app --reload --app-dir apps/api/src
 
 dev-worker-fast:
-	uv run celery -A visora_workers.celery_app worker -Q fast --loglevel=info
+	uv run python -m celery -A visora_workers.celery_app worker -Q fast --loglevel=info
 
 dev-worker-render:
-	uv run celery -A visora_workers.celery_app worker -Q render --loglevel=info
+	uv run python -m celery -A visora_workers.celery_app worker -Q render --loglevel=info
+
+dev-worker:
+	uv run python -m celery -A visora_workers.celery_app worker --loglevel=info
 
 gen-types:
 	uv run python scripts/generate_ts_types.py
