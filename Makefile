@@ -11,13 +11,13 @@ dev-api:
 	uv run python -m uvicorn visora.main:app --reload --app-dir apps/api/src
 
 dev-worker-fast:
-	uv run python -m celery -A visora_workers.celery_app worker -Q fast --loglevel=info
+	uv run python -m celery -A visora_workers.celery_app worker -Q fast --pool=solo --loglevel=info
 
 dev-worker-render:
-	uv run python -m celery -A visora_workers.celery_app worker -Q render --loglevel=info
+	uv run python -m celery -A visora_workers.celery_app worker -Q render --pool=solo --loglevel=info
 
 dev-worker:
-	uv run python -m celery -A visora_workers.celery_app worker --loglevel=info
+	uv run python -m celery -A visora_workers.celery_app worker --pool=solo --loglevel=info
 
 gen-types:
 	uv run python scripts/generate_ts_types.py
