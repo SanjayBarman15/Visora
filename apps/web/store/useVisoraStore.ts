@@ -50,7 +50,7 @@ interface VisoraState {
   checkpointId: string | null
 
   // Actions
-  initProject: (projectId: string, sessionId: string) => void
+  initProject: (projectId: string, sessionId: string) => Promise<void>
   resetStore: () => void
   sendMessage: (text: string) => Promise<void>
   generateScenePlan: () => Promise<void>
@@ -85,8 +85,66 @@ const defaultState = {
 export const useVisoraStore = create<VisoraState>((set, get) => ({
   ...defaultState,
 
-  initProject: (projectId: string, sessionId: string) => {
+  initProject: async (projectId: string, sessionId: string) => {
     set({ projectId, sessionId })
+
+    try {
+      const { createClient } = await import('@/utils/supabase/client')
+      const supabase = createClient()
+
+      // 1. Fetch scene details (scene_index=0)
+      const { data: sceneData } = await supabase
+        .from('scenes')
+        .select('id, title, visual_description, approximate_duration_seconds, status')
+        .eq('project_id', projectId)
+        .eq('scene_index', 0)
+        .maybeSingle()
+
+      // 2. Fetch latest checkpoint
+      const { data: checkpointData } = await supabase
+        .from('scene_checkpoints')
+        .select('id, generated_code, render_status, clip_url')
+        .eq('project_id', projectId)
+        .eq('scene_index', 0)
+        .order('attempt_number', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (checkpointData) {
+        set({
+          checkpointId: checkpointData.id,
+          renderStatus: checkpointData.render_status as RenderStatus,
+          clipUrl: checkpointData.clip_url,
+          forgeCode: checkpointData.generated_code ? {
+            code: checkpointData.generated_code,
+            scene_class_name: 'GeneratedScene',
+          } : null,
+        })
+      } else {
+        // Clear render details if no checkpoint exists
+        set({
+          checkpointId: null,
+          renderStatus: 'idle',
+          clipUrl: null,
+          forgeCode: null,
+        })
+      }
+
+      if (sceneData) {
+        set({
+          scenePlan: {
+            title: sceneData.title,
+            description: sceneData.visual_description || '',
+            duration_seconds: sceneData.approximate_duration_seconds || 30,
+            key_visuals: [],
+          }
+        })
+      } else {
+        set({ scenePlan: null })
+      }
+    } catch (err) {
+      console.error('Error hydrating project state:', err)
+    }
   },
 
   resetStore: () => {

@@ -34,7 +34,29 @@ export function useRenderStatus(checkpointId: string | null): RenderState {
     // Set initial status to pending as soon as we have a checkpointId
     setState({ renderStatus: 'pending', clipUrl: null, renderError: null })
 
-    // Subscribe to Postgres changes on this specific checkpoint row
+
+    // 1. Fallback polling helper (checks status every 3 seconds)
+    const pollStatus = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/render/status/${checkpointId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setState({
+            renderStatus: data.render_status as RenderStatus,
+            clipUrl: data.clip_url ?? null,
+            renderError: data.render_error ?? null,
+          })
+        }
+      } catch (err) {
+        console.error('Error polling render status:', err)
+      }
+    }
+
+    // Run once immediately
+    pollStatus()
+    const interval = setInterval(pollStatus, 3000)
+
+    // 2. Subscribe to Postgres changes on this specific checkpoint row (realtime)
     const channel = supabase
       .channel(`render:${checkpointId}`)
       .on(
@@ -62,6 +84,7 @@ export function useRenderStatus(checkpointId: string | null): RenderState {
       .subscribe()
 
     return () => {
+      clearInterval(interval)
       supabase.removeChannel(channel)
     }
   }, [checkpointId])
