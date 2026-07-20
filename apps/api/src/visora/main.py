@@ -17,7 +17,7 @@ app = FastAPI(title="Visora Backend API", version="0.1.0")
 # Setup CORS middleware to allow communication from frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust in production
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Adjust in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

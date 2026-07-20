@@ -66,21 +66,38 @@ def submit_render(payload: RenderSubmitRequest):
     """
     supabase = _get_supabase()
 
-    # ── Create the scenes row ──────────────────────────────────────────────
-    scene_resp = supabase.table("scenes").insert({
-        "project_id": payload.project_id,
-        "scene_index": 0,
-        "title": payload.scene_title or "Scene",
-        "visual_description": payload.scene_description or "",
-        "approximate_duration_seconds": payload.duration_seconds or 30.0,
-        "status": "pending",
-        "complexity": "medium",
-    }).select("id").single().execute()
+    # ── Create or get the scenes row ──────────────────────────────────────
+    existing_scene = supabase.table("scenes").select("id").eq("project_id", payload.project_id).eq("scene_index", 0).execute()
+    
+    if existing_scene.data:
+        scene_id = existing_scene.data[0]["id"]
+        supabase.table("scenes").update({
+            "title": payload.scene_title or "Scene",
+            "visual_description": payload.scene_description or "",
+            "approximate_duration_seconds": payload.duration_seconds or 30.0,
+            "status": "pending",
+        }).eq("id", scene_id).execute()
+    else:
+        scene_resp = supabase.table("scenes").insert({
+            "project_id": payload.project_id,
+            "scene_index": 0,
+            "title": payload.scene_title or "Scene",
+            "visual_description": payload.scene_description or "",
+            "approximate_duration_seconds": payload.duration_seconds or 30.0,
+            "status": "pending",
+            "complexity": "medium",
+        }).select("id").execute()
 
-    if not scene_resp.data:
-        raise HTTPException(status_code=500, detail="Failed to create scene record")
+        if not scene_resp.data:
+            raise HTTPException(status_code=500, detail="Failed to create scene record")
 
-    scene_id = scene_resp.data["id"]
+        scene_id = scene_resp.data[0]["id"]
+
+    # ── Calculate next attempt_number for checkpoint ───────────────────────
+    checkpoints_resp = supabase.table("scene_checkpoints").select("attempt_number").eq("scene_id", scene_id).order("attempt_number", desc=True).limit(1).execute()
+    attempt_number = 1
+    if checkpoints_resp.data:
+        attempt_number = checkpoints_resp.data[0]["attempt_number"] + 1
 
     # ── Create the scene_checkpoints row ──────────────────────────────────
     checkpoint_resp = supabase.table("scene_checkpoints").insert({
@@ -89,13 +106,13 @@ def submit_render(payload: RenderSubmitRequest):
         "scene_index": 0,
         "generated_code": payload.code,
         "render_status": "pending",
-        "attempt_number": 1,
-    }).select("id").single().execute()
+        "attempt_number": attempt_number,
+    }).select("id").execute()
 
     if not checkpoint_resp.data:
         raise HTTPException(status_code=500, detail="Failed to create checkpoint record")
 
-    checkpoint_id = checkpoint_resp.data["id"]
+    checkpoint_id = checkpoint_resp.data[0]["id"]
 
     # ── Dispatch the Celery task (non-blocking) ────────────────────────────
     task = render_manim_scene.delay(
@@ -128,12 +145,12 @@ def get_render_status(checkpoint_id: str):
 
     resp = supabase.table("scene_checkpoints").select(
         "id, render_status, clip_url, render_error"
-    ).eq("id", checkpoint_id).single().execute()
+    ).eq("id", checkpoint_id).execute()
 
     if not resp.data:
         raise HTTPException(status_code=404, detail="Checkpoint not found")
 
-    data = resp.data
+    data = resp.data[0]
     return RenderStatusResponse(
         checkpoint_id=data["id"],
         render_status=data["render_status"],
